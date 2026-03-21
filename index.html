@@ -319,52 +319,53 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     // Already initialized
   }
   window.db = firebase.firestore();
-  db.settings({ experimentalForceLongPolling: true, merge: true });
+  var _db = window.db;
+  _db.settings({ experimentalForceLongPolling: true, merge: true });
 
   // ── Save functions ──
   window._fbSaveUser = async function(cnic, data){
-    try{ await db.collection("users").doc(String(cnic)).set({...data, _updatedAt: Date.now()}); }
+    try{ await _db.collection("users").doc(String(cnic)).set({...data, _updatedAt: Date.now()}); }
     catch(e){ console.warn("fbSaveUser error", e); }
   };
   window._fbGetUser = async function(cnic){
-    try{ const s = await db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
+    try{ const s = await _db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
     catch(e){ return null; }
   };
   window._fbGetAllUsers = async function(){
-    try{ const s = await db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
+    try{ const s = await _db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
     catch(e){ return null; }
   };
   window._fbSaveAppt = async function(appt){
-    try{ await db.collection("appointments").doc(String(appt.id)).set(appt); }
+    try{ await _db.collection("appointments").doc(String(appt.id)).set(appt); }
     catch(e){ console.warn("fbSaveAppt error", e); }
   };
   window._fbGetAllAppts = async function(){
-    try{ const s = await db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
+    try{ const s = await _db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
     catch(e){ return null; }
   };
   window._fbSaveComplaint = async function(c){
-    try{ await db.collection("complaints").doc(String(c.id||Date.now())).set(c); }
+    try{ await _db.collection("complaints").doc(String(c.id||Date.now())).set(c); }
     catch(e){}
   };
   window._fbSaveFeedback = async function(f){
-    try{ await db.collection("feedbacks").doc(String(f.id||Date.now())).set(f); }
+    try{ await _db.collection("feedbacks").doc(String(f.id||Date.now())).set(f); }
     catch(e){}
   };
   window._fbGetAllComplaints = async function(){
-    try{ const s=await db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    try{ const s=await _db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
     catch(e){ return null; }
   };
   window._fbGetAllFeedbacks = async function(){
-    try{ const s=await db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    try{ const s=await _db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
     catch(e){ return null; }
   };
   window._fbSaveSlip = async function(slip){
-    try{ await db.collection("slips").doc(String(slip.apptId||Date.now())).set(slip); }
+    try{ await _db.collection("slips").doc(String(slip.apptId||Date.now())).set(slip); }
     catch(e){}
   };
 
   // ── Real-time listener for appointments ──
-  db.collection("appointments").onSnapshot(function(snap){
+  _db.collection("appointments").onSnapshot(function(snap){
     try{
       const data=[];
       snap.forEach(d=>data.push(d.data()));
@@ -384,7 +385,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
   });
 
   // ── Real-time listener for users ──
-  db.collection("users").onSnapshot(function(snap){
+  _db.collection("users").onSnapshot(function(snap){
     try{
       const u={};
       snap.forEach(d=>u[d.id]=d.data());
@@ -393,10 +394,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
   });
 
   // Make db accessible everywhere
-  var db = window.db;
+  // db alias already set as _db above
 
   // Connection test
-  window.db.collection("_ping").doc("test").set({t: Date.now()})
+  _db.collection("_ping").doc("test").set({t: Date.now()})
     .then(function(){ console.log("✅ Firebase write test: SUCCESS"); })
     .catch(function(e){ console.error("❌ Firebase write FAILED:", e.code, e.message); });
   
