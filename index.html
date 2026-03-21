@@ -1414,7 +1414,7 @@ let currentUser=null,otpTimerInterval=null,currentSlipData=null;
 // ═══════════════════════════════════════
 // BOOT — direct to login, no loading screen
 // ═══════════════════════════════════════
-var _bootDone=false;
+var _bootDone=false; window._bootDone=false;
 // ── Logged Devices ──
 function getDeviceName(){
   var ua=navigator.userAgent;
@@ -1484,7 +1484,7 @@ window.addEventListener('online', updateNetStatus);
 window.addEventListener('offline', updateNetStatus);
 
 function bootApp(){
-  if(_bootDone)return;_bootDone=true;
+  if(_bootDone)return;_bootDone=true;window._bootDone=true;
   try{
     initDarkMode();
     updateNetStatus();
@@ -1494,9 +1494,15 @@ function bootApp(){
     startPrayerAlertChecker();
   }catch(e){showScreen('login');showLoginFlash();}
 }
-// Boot triggered by Firebase sync (or fallback if Firebase not available)
-window.onload=function(){setTimeout(function(){if(!window._bootDone)bootApp();},3000);};
-setTimeout(function(){if(!window._bootDone)bootApp();},1500);
+// Boot - wait for Firebase then boot, fallback after 4s
+window.onload=function(){
+  var waited=0;
+  var waitForFb=setInterval(function(){
+    waited+=100;
+    if(window.db){clearInterval(waitForFb);if(!window._bootDone)bootApp();}
+    else if(waited>=4000){clearInterval(waitForFb);if(!window._bootDone)bootApp();}
+  },100);
+};
 
 // ═══════════════════════════════════════
 // DATE/TIME FORMAT HELPER
