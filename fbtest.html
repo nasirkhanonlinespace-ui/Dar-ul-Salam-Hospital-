@@ -3,33 +3,52 @@
 <head><meta charset="UTF-8"/><title>Firebase Test</title></head>
 <body>
 <h2>Firebase Connection Test</h2>
-<div id="status">Testing...</div>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<div id="status">Loading SDK...</div>
+<div id="log" style="font-size:.8rem;margin-top:10px;color:#555;"></div>
 <script>
-var status = document.getElementById('status');
-try {
-  firebase.initializeApp({
-    apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
-    authDomain: "dar-ul-salam-hospital-ry-382e2.firebaseapp.com",
-    projectId: "dar-ul-salam-hospital-ry-382e2",
-    storageBucket: "dar-ul-salam-hospital-ry-382e2.firebasestorage.app",
-    messagingSenderId: "659652861452",
-    appId: "1:659652861452:web:177d4d38c31909bee99829"
-  });
-  var db = firebase.firestore();
-  db.settings({ experimentalForceLongPolling: true, merge: true });
-  status.innerHTML = '⏳ Firebase loaded, testing write...';
-  db.collection("test").doc("ping").set({ t: Date.now(), msg: "hello" })
-    .then(function() {
-      status.innerHTML = '<span style="color:green;font-size:1.5rem;">✅ FIREBASE WORKS! Data saved!</span>';
-    })
-    .catch(function(e) {
-      status.innerHTML = '<span style="color:red;">❌ WRITE FAILED: ' + e.code + ' — ' + e.message + '</span>';
+function log(msg){ document.getElementById('log').innerHTML += '<br>'+msg; }
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"
+  onload="log('✅ firebase-app loaded')"
+  onerror="log('❌ firebase-app FAILED')"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"
+  onload="log('✅ firebase-firestore loaded')"
+  onerror="log('❌ firebase-firestore FAILED')"></script>
+<script>
+window.addEventListener('load', function(){
+  var st = document.getElementById('status');
+  log('Page loaded, starting test...');
+  try {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
+      projectId: "dar-ul-salam-hospital-ry-382e2",
     });
-} catch(e) {
-  status.innerHTML = '<span style="color:red;">❌ INIT FAILED: ' + e.message + '</span>';
-}
+    log('✅ Firebase initialized');
+    var db = firebase.firestore();
+    log('✅ Firestore instance created');
+    st.innerHTML = '⏳ Writing to Firestore...';
+    
+    // Timeout after 10 seconds
+    var timeout = setTimeout(function(){
+      st.innerHTML = '<span style="color:orange;">⚠️ TIMEOUT — no response from Firestore after 10s</span>';
+      log('Check: internet connection, Firestore rules, project ID');
+    }, 10000);
+    
+    db.collection("test").doc("ping").set({ t: Date.now() })
+      .then(function(){
+        clearTimeout(timeout);
+        st.innerHTML = '<span style="color:green;font-size:1.3rem;font-weight:bold;">✅ SUCCESS! Firebase works!</span>';
+        log('Data saved to Firestore!');
+      })
+      .catch(function(e){
+        clearTimeout(timeout);
+        st.innerHTML = '<span style="color:red;">❌ ERROR: ' + e.code + '</span>';
+        log('Error: ' + e.message);
+      });
+  } catch(e) {
+    st.innerHTML = '<span style="color:red;">❌ INIT ERROR: ' + e.message + '</span>';
+  }
+});
 </script>
 </body>
 </html>
