@@ -1716,13 +1716,24 @@ function checkRememberedSession(){
   }
   if(sess.startsWith('patient:')){
     const cnic=sess.split(':')[1];
-    const u=getUsers()[cnic];
-    if(!u){_ls.removeItem('dush_session');return;}
-    currentUser=u;
-    document.getElementById('patient-name-display').textContent=currentUser.name;
-    document.getElementById('sb-patient-name').textContent=currentUser.name;
-    backPatientDash();showScreen('patient');updateDrNotifications();checkAndShowNotice();
-    setTimeout(function(){var b=document.getElementById('tt-flash-bar');if(b)b.style.display='block';},1200);
+    showLoader('Logging in...');
+    (async function(){
+      // Try Firebase first
+      try{
+        if(window._fbGetUser){
+          var fbUser=await window._fbGetUser(cnic);
+          if(fbUser){var u=getUsers();u[cnic]=fbUser;try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){}}
+        }
+      }catch(e){}
+      var u=getUsers()[cnic];
+      hideLoader();
+      if(!u){_ls.removeItem('dush_session');return;}
+      currentUser=u;
+      document.getElementById('patient-name-display').textContent=currentUser.name;
+      document.getElementById('sb-patient-name').textContent=currentUser.name;
+      backPatientDash();showScreen('patient');updateDrNotifications();checkAndShowNotice();
+      setTimeout(function(){var b=document.getElementById('tt-flash-bar');if(b)b.style.display='block';},1200);
+    })();
   }
 }
 
@@ -1902,9 +1913,13 @@ async function doSignupFirebase(userData,btn){
     openModal('confirm');
     // Save to Firebase
     try{
-      await getDb().collection("users").doc(userData.cnic).set({...userData, _updatedAt: Date.now()});
-      console.log("✅ User saved to Firebase:", userData.cnic);
-    }catch(e2){ console.warn("Firebase user save error:", e2); }
+      var fbDb = getDb();
+      if(!fbDb){ console.error("❌ getDb() returned null!"); }
+      else {
+        await fbDb.collection("users").doc(String(userData.cnic)).set(Object.assign({}, userData, {_updatedAt: Date.now()}));
+        console.log("✅ User saved to Firebase:", userData.cnic);
+      }
+    }catch(e2){ console.warn("Firebase user save error:", e2.code, e2.message); }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
     showMsg('signup-msg','❌ Error creating account. Try again.','error');
@@ -2028,11 +2043,14 @@ function submitAppt(){
   // Save to Firebase
   (async function(){
     try{
-      await getDb().collection("appointments").doc(String(newAppt.id)).set(newAppt);
+      var fbDb=getDb();
+      if(!fbDb){console.error("❌ getDb null");return;}
+      var plain=JSON.parse(JSON.stringify(newAppt));
+      await fbDb.collection("appointments").doc(String(newAppt.id)).set(plain);
       console.log("✅ Appointment saved to Firebase:", newAppt.id);
     }catch(e){
-      console.warn("Firebase appt error:", e);
-      try{ await new Promise(r=>setTimeout(r,1500)); await db.collection("appointments").doc(String(newAppt.id)).set(newAppt); }catch(e2){}
+      console.warn("Firebase appt error:", e.code, e.message);
+      try{ await new Promise(r=>setTimeout(r,2000)); var fb2=getDb(); if(fb2) await fb2.collection("appointments").doc(String(newAppt.id)).set(JSON.parse(JSON.stringify(newAppt))); }catch(e2){ console.warn("Retry failed:",e2.message); }
     }
   })();
   updateDrNotifications();
