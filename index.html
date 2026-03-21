@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"/>
 <title>Dar Ul Salam Hospital - Ryk</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --red:#b8000a;--dark-red:#7a0007;--bg:#eef2f7;--card:#fff;
@@ -34,6 +34,14 @@ body.dark-mode #daily-summary-strip{background:linear-gradient(135deg,#161b22,#2
 body.dark-mode .marquee-bar{background:#21262d;}
 body.dark-mode .marquee-inner span{color:#e6edf3;}
 @keyframes arrowBounce{from{transform:translateX(0)}to{transform:translateX(-5px)}}
+
+/* ══ DIGITAL CLOCK ══ */
+.digi-clock{background:#0a1a0a;border:1.5px solid #1a3a1a;border-radius:10px;padding:7px 14px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 0 16px rgba(0,255,80,.1);}
+.digi-clock .dc-time{font-family:'Share Tech Mono',monospace;font-size:1.15rem;color:#00ff50;letter-spacing:.06em;text-shadow:0 0 8px rgba(0,255,80,.8);}
+.digi-clock .dc-right{display:flex;flex-direction:column;align-items:flex-start;gap:1px;}
+.digi-clock .dc-ampm{font-family:'Orbitron',monospace;font-size:.38rem;font-weight:700;color:rgba(0,255,80,.7);letter-spacing:.1em;}
+.digi-clock .dc-date{font-family:'Orbitron',monospace;font-size:.34rem;color:rgba(0,255,80,.5);letter-spacing:.07em;}
+
 /* Dark mode toggle button */
 .dm-toggle{background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px 6px;border-radius:6px;transition:background .2s;}
 .dm-toggle:hover{background:rgba(255,255,255,.15);}
@@ -151,7 +159,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 .sb-item.danger{color:var(--red);}
 
 /* ══ DASHBOARD ══ */
-.dash-scroll{flex:1;overflow-y:auto;padding:10px 12px 8px;}
+.dash-scroll{flex:1;overflow-y:auto;padding:10px 12px 80px;-webkit-overflow-scrolling:touch;}
 .welcome-bar{background:linear-gradient(135deg,var(--dark-red),var(--red));border-radius:10px;padding:9px 14px;color:#fff;margin-bottom:10px;font-size:.8rem;font-weight:600;text-align:center;}
 .welcome-bar strong{font-family:'Merriweather',serif;font-size:.88rem;}
 .dash-label{text-align:center;font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-bottom:8px;}
@@ -164,8 +172,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 
 /* ══ CONTENT PANEL ══ */
-.panel-wrap{flex:1;overflow-y:auto;padding:0 12px 8px;}
-.content-panel{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);}
+.panel-wrap{flex:1;overflow-y:auto;padding:0 12px 16px;-webkit-overflow-scrolling:touch;}
+.content-panel{background:#fff;border-radius:12px;padding:12px 14px 24px;box-shadow:var(--shadow);}
 .panel-title{font-family:'Merriweather',serif;color:var(--dark-red);font-size:.9rem;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid #f5e0e0;display:flex;align-items:center;justify-content:space-between;}
 .back-to-dash{background:linear-gradient(135deg,#f0f4ff,#e0e8ff);border:1.5px solid #4a7aff;color:#1a3a8a;cursor:pointer;font-size:.78rem;font-weight:700;font-family:'Source Sans 3',sans-serif;padding:5px 12px;border-radius:7px;transition:background .2s;}
 .back-to-dash:hover{background:linear-gradient(135deg,#4a7aff,#1a3a8a);color:#fff;}
@@ -295,249 +303,91 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script>
   const firebaseConfig = {
-    apiKey: "AIzaSyBjp0WXNJ89z_efUdgAhi_SN1JA7aSJSQg",
-    authDomain: "darulsalamhospital-c9759.firebaseapp.com",
-    projectId: "darulsalamhospital-c9759",
-    storageBucket: "darulsalamhospital-c9759.firebasestorage.app",
-    messagingSenderId: "737614990218",
-    appId: "1:737614990218:web:b1bf1d182dc4c225ce1673"
+    apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
+    authDomain: "dar-ul-salam-hospital-ry-382e2.firebaseapp.com",
+    projectId: "dar-ul-salam-hospital-ry-382e2",
+    storageBucket: "dar-ul-salam-hospital-ry-382e2.firebasestorage.app",
+    messagingSenderId: "659652861452",
+    appId: "1:659652861452:web:177d4d38c31909bee99829"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const storage = firebase.storage();
+  db.settings({ experimentalForceLongPolling: true, merge: true });
 
-  async function fbSaveUser(cnic, userData) {
-    try { await db.collection("users").doc(cnic).set({ ...userData, _updatedAt: Date.now() }); }
-    catch(e) { console.warn("fbSaveUser error", e); }
-  }
-  async function fbGetUser(cnic) {
-    try {
-      const snap = await db.collection("users").doc(cnic).get();
-      if (snap.exists) return snap.data();
-    } catch(e) { console.warn("fbGetUser error", e); }
-    return null;
-  }
-  async function fbGetAllUsers() {
-    try {
-      const snap = await db.collection("users").get();
-      const users = {};
-      snap.forEach(d => users[d.id] = d.data());
-      return users;
-    } catch(e) { console.warn("fbGetAllUsers error", e); return null; }
-  }
-  async function fbSaveAppt(appt) {
-    try { await db.collection("appointments").doc(String(appt.id)).set(appt); }
-    catch(e) { console.warn("fbSaveAppt error", e); }
-  }
-  async function fbSaveAllAppts(appts) {
-    try { for (const a of appts) await db.collection("appointments").doc(String(a.id)).set(a); }
-    catch(e) { console.warn("fbSaveAllAppts error", e); }
-  }
-  async function fbGetAllAppts() {
-    try {
-      const snap = await db.collection("appointments").get();
-      const appts = [];
-      snap.forEach(d => appts.push(d.data()));
-      return appts.sort((a,b) => (b.id||0)-(a.id||0));
-    } catch(e) { console.warn("fbGetAllAppts error", e); return null; }
-  }
-  async function fbSaveSlip(slip) {
-    try { await db.collection("slips").doc(String(slip.id||slip.apptId||Date.now())).set(slip); }
-    catch(e) { console.warn("fbSaveSlip error", e); }
-  }
-  async function fbGetAllSlips() {
-    try {
-      const snap = await db.collection("slips").get();
-      const slips = [];
-      snap.forEach(d => slips.push(d.data()));
-      return slips;
-    } catch(e) { console.warn("fbGetAllSlips error", e); return null; }
-  }
-  async function fbSaveComplaint(c) {
-    try { await db.collection("complaints").doc(String(c.id||Date.now())).set(c); }
-    catch(e) { console.warn("fbSaveComplaint error", e); }
-  }
-  async function fbGetAllComplaints() {
-    try {
-      const snap = await db.collection("complaints").get();
-      const arr = [];
-      snap.forEach(d => arr.push(d.data()));
-      return arr;
-    } catch(e) { console.warn("fbGetAllComplaints error", e); return null; }
-  }
-  async function fbSaveFeedback(f) {
-    try { await db.collection("feedbacks").doc(String(f.id||Date.now())).set(f); }
-    catch(e) { console.warn("fbSaveFeedback error", e); }
-  }
-  async function fbGetAllFeedbacks() {
-    try {
-      const snap = await db.collection("feedbacks").get();
-      const arr = [];
-      snap.forEach(d => arr.push(d.data()));
-      return arr;
-    } catch(e) { console.warn("fbGetAllFeedbacks error", e); return null; }
-  }
-  async function fbSaveAdmitted(a) {
-    try { await db.collection("admitted").doc(String(a.cnic)).set(a); }
-    catch(e) { console.warn("fbSaveAdmitted error", e); }
-  }
-  async function fbGetAllAdmitted() {
-    try {
-      const snap = await db.collection("admitted").get();
-      const arr = [];
-      snap.forEach(d => arr.push(d.data()));
-      return arr;
-    } catch(e) { console.warn("fbGetAllAdmitted error", e); return null; }
-  }
-  async function fbDeleteAdmitted(cnic) {
-    try { await db.collection("admitted").doc(String(cnic)).delete(); }
-    catch(e) { console.warn("fbDeleteAdmitted error", e); }
-  }
-  async function fbSet(key, data) {
-    try { await db.collection("appdata").doc(key).set({ value: JSON.stringify(data) }); }
-    catch(e) { console.warn("fbSet error", e); }
-  }
-  async function fbGet(key) {
-    try {
-      const snap = await db.collection("appdata").doc(key).get();
-      if (snap.exists) { const d = snap.data(); return d.value ? JSON.parse(d.value) : d; }
-    } catch(e) { console.warn("fbGet error", e); }
-    return null;
-  }
-  async function fbUploadReport() { return null; }
-  async function fbGetReports() { return []; }
-  async function fbGetAllReports() { return []; }
+  // ── Save functions ──
+  window._fbSaveUser = async function(cnic, data){
+    try{ await db.collection("users").doc(String(cnic)).set({...data, _updatedAt: Date.now()}); }
+    catch(e){ console.warn("fbSaveUser error", e); }
+  };
+  window._fbGetUser = async function(cnic){
+    try{ const s = await db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
+    catch(e){ return null; }
+  };
+  window._fbGetAllUsers = async function(){
+    try{ const s = await db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
+    catch(e){ return null; }
+  };
+  window._fbSaveAppt = async function(appt){
+    try{ await db.collection("appointments").doc(String(appt.id)).set(appt); }
+    catch(e){ console.warn("fbSaveAppt error", e); }
+  };
+  window._fbGetAllAppts = async function(){
+    try{ const s = await db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
+    catch(e){ return null; }
+  };
+  window._fbSaveComplaint = async function(c){
+    try{ await db.collection("complaints").doc(String(c.id||Date.now())).set(c); }
+    catch(e){}
+  };
+  window._fbSaveFeedback = async function(f){
+    try{ await db.collection("feedbacks").doc(String(f.id||Date.now())).set(f); }
+    catch(e){}
+  };
+  window._fbGetAllComplaints = async function(){
+    try{ const s=await db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    catch(e){ return null; }
+  };
+  window._fbGetAllFeedbacks = async function(){
+    try{ const s=await db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    catch(e){ return null; }
+  };
+  window._fbSaveSlip = async function(slip){
+    try{ await db.collection("slips").doc(String(slip.apptId||Date.now())).set(slip); }
+    catch(e){}
+  };
 
-  // Expose all functions
-  window._fbSet = fbSet;
-  window._fbGet = fbGet;
-  window._fbReady = true;
-  window._fbGetUser = fbGetUser;
-  window._fbSaveUser = fbSaveUser;
-  window._fbGetAllUsers = fbGetAllUsers;
-  window._fbSaveAppt = fbSaveAppt;
-  window._fbSaveAllAppts = fbSaveAllAppts;
-  window._fbGetAllAppts = fbGetAllAppts;
-  window._fbSaveSlip = fbSaveSlip;
-  window._fbGetAllSlips = fbGetAllSlips;
-  window._fbSaveComplaint = fbSaveComplaint;
-  window._fbGetAllComplaints = fbGetAllComplaints;
-  window._fbSaveFeedback = fbSaveFeedback;
-  window._fbGetAllFeedbacks = fbGetAllFeedbacks;
-  window._fbSaveAdmitted = fbSaveAdmitted;
-  window._fbGetAllAdmitted = fbGetAllAdmitted;
-  window._fbDeleteAdmitted = fbDeleteAdmitted;
-  window._fbUploadReport = fbUploadReport;
-  window._fbGetReports = fbGetReports;
-  window._fbGetAllReports = fbGetAllReports;
-  window.storage = storage;
-
-  async function syncFromFirebase() {
-    console.log("🔄 Syncing from Firebase...");
-    try {
-      // Sync appointments - ALWAYS from 'appointments' collection (individual docs)
-      let appts = await fbGetAllAppts();
-      if (appts && Array.isArray(appts)) {
-        localStorage.setItem('dush_appts', JSON.stringify(appts));
-        console.log("✅ Appointments synced:", appts.length);
-      }
-      // Sync users
-      let users = await fbGetAllUsers();
-      if (users && Object.keys(users).length > 0) {
-        localStorage.setItem('dush_users', JSON.stringify(users));
-      }
-      // Sync slips
-      let slips = await fbGetAllSlips();
-      if (slips && Array.isArray(slips)) localStorage.setItem('dush_slips', JSON.stringify(slips));
-      // Sync complaints
-      let complaints = await fbGetAllComplaints();
-      if (complaints && Array.isArray(complaints)) localStorage.setItem('dush_complaints', JSON.stringify(complaints));
-      // Sync feedbacks
-      let feedbacks = await fbGetAllFeedbacks();
-      if (feedbacks && Array.isArray(feedbacks)) localStorage.setItem('dush_feedbacks', JSON.stringify(feedbacks));
-      // Sync admitted
-      let admitted = await fbGetAllAdmitted();
-      if (admitted && Array.isArray(admitted)) localStorage.setItem('dush_admitted', JSON.stringify(admitted));
-      // Sync timetable and notice
-      const tt = await fbGet('dush_timetable');
-      if (tt) localStorage.setItem('dush_timetable', JSON.stringify(tt));
-      const notice = await fbGet('dush_notice');
-      if (notice) localStorage.setItem('dush_notice', JSON.stringify(notice));
-    } catch(e) {
-      console.warn("syncFromFirebase error:", e);
-    }
-    console.log("✅ Firebase sync complete");
-    if (window.bootApp) window.bootApp();
-  }
-
-  // Real-time listener for appointments
-  db.collection("appointments").onSnapshot(function(snap) {
-    try {
-      const freshData = [];
-      snap.forEach(d => freshData.push(d.data()));
-      freshData.sort((a,b) => (b.id||0)-(a.id||0));
-      // Always update localStorage even if empty array
-      const oldRaw = localStorage.getItem('dush_appts');
-      const oldData = oldRaw ? JSON.parse(oldRaw) : [];
-      const oldPending = oldData.filter(a => a.status === 'pending').length;
-      const newPending = freshData.filter(a => a.status === 'pending').length;
-      localStorage.setItem('dush_appts', JSON.stringify(freshData));
-      if (window.updateDrNotifications) window.updateDrNotifications();
-      // If Dr is on booked-appts panel, auto-refresh it
-      const sess = localStorage.getItem('dush_session');
-      if (sess === 'doctor') {
-        if (newPending > oldPending) {
-          const newest = freshData.filter(a => a.status === 'pending').sort((a,b) => b.id - a.id)[0];
-          if (window.triggerDrNotif && newest) window.triggerDrNotif(newest.patientName, newest.type);
-        }
-        // Auto-refresh booked panel if it's currently open
-        var panelTitle = document.getElementById('doctor-panel-title');
-        var panelBody = document.getElementById('doctor-panel-body');
-        var drPanelWrap = document.getElementById('doctor-panel-wrap');
-        if (panelTitle && panelBody && drPanelWrap && drPanelWrap.style.display !== 'none') {
-          if (panelTitle.textContent.includes('Booked Appointments') && window.renderDrBookedAppts) {
-            window.renderDrBookedAppts(panelBody);
-          }
+  // ── Real-time listener for appointments ──
+  db.collection("appointments").onSnapshot(function(snap){
+    try{
+      const data=[];
+      snap.forEach(d=>data.push(d.data()));
+      data.sort((a,b)=>(b.id||0)-(a.id||0));
+      localStorage.setItem('dush_appts', JSON.stringify(data));
+      if(window.updateDrNotifications) window.updateDrNotifications();
+      // Auto-refresh Dr booked panel if open
+      var sess=localStorage.getItem('dush_session');
+      if(sess==='doctor'){
+        var panelTitle=document.getElementById('doctor-panel-title');
+        var panelBody=document.getElementById('doctor-panel-body');
+        if(panelTitle && panelTitle.textContent.includes('Booked') && window.renderDrBookedAppts){
+          window.renderDrBookedAppts(panelBody);
         }
       }
-    } catch(e) { console.warn('onSnapshot error', e); }
+    }catch(e){}
   });
 
-  // Real-time listener for complaints
-  db.collection("complaints").onSnapshot(function(snap) {
-    try {
-      const arr = [];
-      snap.forEach(d => arr.push(d.data()));
-      if(arr.length > 0) localStorage.setItem('dush_complaints', JSON.stringify(arr));
-      if(window.updateDrNotifications) window.updateDrNotifications();
-    } catch(e) {}
+  // ── Real-time listener for users ──
+  db.collection("users").onSnapshot(function(snap){
+    try{
+      const u={};
+      snap.forEach(d=>u[d.id]=d.data());
+      if(Object.keys(u).length>0) localStorage.setItem('dush_users', JSON.stringify(u));
+    }catch(e){}
   });
 
-  // Real-time listener for feedbacks
-  db.collection("feedbacks").onSnapshot(function(snap) {
-    try {
-      const arr = [];
-      snap.forEach(d => arr.push(d.data()));
-      if(arr.length > 0) localStorage.setItem('dush_feedbacks', JSON.stringify(arr));
-      if(window.updateDrNotifications) window.updateDrNotifications();
-    } catch(e) {}
-  });
-
-  // Real-time listener for users
-  db.collection("users").onSnapshot(function(snap) {
-    try {
-      const users = {};
-      snap.forEach(d => { users[d.id] = d.data(); });
-      if(Object.keys(users).length > 0) localStorage.setItem('dush_users', JSON.stringify(users));
-    } catch(e) {}
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    syncFromFirebase();
-  });
+  console.log("✅ Firebase initialized — Dar Ul Salam Hospital");
 </script>
 </head>
 <body>
@@ -560,6 +410,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
   <button onclick="closeLoginFlash()" style="position:absolute;top:8px;right:10px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:.72rem;cursor:pointer;font-weight:700;">✕</button>
 </div>
 <style>@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+
+
+
 .anim-road{width:220px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;position:relative;margin:18px 0;}
 /* ══ BOOKING LOADER ══ */
 #booking-loader{display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);align-items:center;justify-content:center;backdrop-filter:blur(4px);}
@@ -617,14 +470,77 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 
 
 
+
+/* ══ APPOINTMENT ANIMATION ══ */
+#appt-anim-ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:linear-gradient(135deg,#060f1e,#0f1e38);flex-direction:column;align-items:center;justify-content:center;}
+.aa-hosp-lbl{font-family:Orbitron,monospace;font-size:.6rem;font-weight:700;color:rgba(255,180,180,.5);letter-spacing:.2em;text-transform:uppercase;margin-bottom:28px;text-align:center;}
+.aa-scene{display:flex;align-items:center;justify-content:center;width:100%;max-width:340px;margin-bottom:20px;padding:0 16px;}
+.aa-icon-box{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;}
+.aa-big-icon{font-size:4rem;}
+.aa-icon-lbl{font-size:.52rem;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.aa-road-box{flex:1;position:relative;height:50px;display:flex;align-items:center;margin:0 8px;}
+.aa-road-line{width:100%;height:6px;background:rgba(255,255,255,.08);border-radius:6px;position:relative;}
+.aa-road-line::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.3) 0,rgba(255,255,255,.3) 8px,transparent 8px,transparent 18px);transform:translateY(-50%);}
+#aa-moving-file{position:absolute;top:50%;left:0;transform:translateY(-65%);font-size:2rem;filter:drop-shadow(0 0 8px rgba(255,220,50,1));}
+#aa-status-msg{font-family:monospace;font-size:.8rem;color:#ffb3b3;letter-spacing:.06em;text-align:center;min-height:22px;}
+#aa-success-box{display:none;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:0 20px;}
+.aa-success-card{background:linear-gradient(135deg,#071a10,#0a2a18);border:2px solid rgba(74,255,145,.25);border-radius:18px;padding:22px 26px;max-width:290px;box-shadow:0 0 40px rgba(74,255,145,.1);}
+.aa-success-title{font-family:monospace;font-size:.95rem;font-weight:800;color:#4eff91;letter-spacing:.06em;margin-bottom:10px;}
+.aa-success-dr{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:6px;}
+.aa-success-msg{font-size:.72rem;color:rgba(255,255,255,.65);line-height:1.8;}
+.aa-success-badge{display:inline-block;margin-top:12px;background:rgba(74,255,145,.12);border:1px solid rgba(74,255,145,.3);border-radius:20px;padding:5px 16px;font-size:.6rem;color:#4eff91;font-weight:700;letter-spacing:.1em;}
+@keyframes aaGlowH{0%,100%{filter:drop-shadow(0 0 8px rgba(255,200,100,.4));}50%{filter:drop-shadow(0 0 22px rgba(255,200,100,.9));}}
+@keyframes aaGlowHosp{0%,100%{filter:drop-shadow(0 0 8px rgba(255,100,100,.4));}50%{filter:drop-shadow(0 0 22px rgba(255,100,100,.9));}}
+
+/* ══ TV NOTICE ══ */
+#modal-notice{z-index:600 !important;}
+.tv-wrap-n{display:flex;flex-direction:column;align-items:center;animation:tvOn .7s cubic-bezier(.34,1.3,.64,1);}
+@keyframes tvOn{from{transform:scale(.4) translateY(80px);opacity:0;}to{transform:scale(1);opacity:1;}}
+.tv-glow-n{position:absolute;top:10%;left:5%;right:5%;bottom:20%;background:radial-gradient(ellipse,rgba(184,0,10,.5) 0%,rgba(0,80,255,.3) 40%,rgba(0,200,100,.2) 70%,transparent 100%);filter:blur(28px);z-index:-1;animation:glowPulse 3s ease-in-out infinite alternate;}
+@keyframes glowPulse{from{opacity:.7;transform:scale(.95);}to{opacity:1;transform:scale(1.05);}}
+.tv-body-n{width:min(95vw,380px);background:linear-gradient(160deg,#2d2d2d,#1a1a1a,#111);border-radius:22px;padding:10px 10px 14px;box-shadow:0 0 0 1.5px #555,0 0 0 3px #2a2a2a,0 0 0 4px #111,0 40px 100px rgba(0,0,0,.95);position:relative;}
+.tv-body-n::before{content:'';position:absolute;top:0;left:8%;right:8%;height:35%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);border-radius:22px 22px 0 0;pointer-events:none;}
+.tv-top-n{display:flex;align-items:center;justify-content:space-between;padding:3px 10px 7px;}
+.tv-brand-n{font-family:'Orbitron',monospace;font-size:.42rem;font-weight:900;color:#444;letter-spacing:.25em;}
+.tv-led-n{width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:ledPulse 2s infinite;}
+.tv-bezel-n{background:#000;border-radius:14px;padding:3px;box-shadow:inset 0 0 0 1px #222;}
+.tv-screen-n{border-radius:12px;overflow:hidden;position:relative;min-height:240px;}
+.tv-screen-bg-n{position:absolute;inset:0;animation:screenShift 6s ease-in-out infinite alternate;}
+@keyframes screenShift{0%{background:linear-gradient(160deg,#1a0030,#0a001a,#001020,#001a08,#100020);}50%{background:linear-gradient(200deg,#001a30,#100010,#1a0010,#001510,#001030);}100%{background:linear-gradient(120deg,#0a1a00,#001020,#1a0020,#001a15,#0a0020);}}
+.tv-screen-n::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.25) 2px,rgba(0,0,0,.25) 4px);z-index:8;pointer-events:none;}
+.tv-screen-n::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 40%,transparent 60%,rgba(255,255,255,.02) 100%);z-index:9;pointer-events:none;}
+.tv-sc-n{position:relative;z-index:5;}
+.tv-ticker-n{background:linear-gradient(90deg,#cc0000,#aa0000,#880000);padding:5px 12px;display:flex;align-items:center;gap:8px;border-bottom:2px solid rgba(255,200,0,.3);}
+.tv-live-n{background:#ffdd00;color:#000;font-family:'Orbitron',monospace;font-size:.42rem;font-weight:900;padding:2px 6px;border-radius:3px;animation:liveBlink .9s infinite;flex-shrink:0;}
+@keyframes liveBlink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.tv-ticker-txt-n{font-family:'Orbitron',monospace;font-size:.44rem;font-weight:700;color:#fff;letter-spacing:.08em;flex:1;}
+.tv-clock-n{font-family:'Orbitron',monospace;font-size:.4rem;color:rgba(255,255,255,.7);flex-shrink:0;}
+.tv-main-n{padding:14px 14px 12px;min-height:180px;display:flex;flex-direction:column;}
+.tv-hosp-n{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.07);}
+.tv-hosp-icon-n{font-size:1.8rem;filter:drop-shadow(0 0 10px rgba(255,100,100,.8));}
+.tv-hosp-name-n{font-family:'Orbitron',monospace;font-size:.5rem;font-weight:900;background:linear-gradient(90deg,#ff4444,#ff8844,#ffdd44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.1em;}
+.tv-hosp-sub-n{font-family:'Orbitron',monospace;font-size:.35rem;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-top:2px;}
+.tv-notice-msg-n{font-size:.84rem;color:#d0d0d0;line-height:1.85;flex:1;direction:rtl;text-align:right;}
+.tv-bot-n{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;}
+.tv-ch-n{font-family:'Orbitron',monospace;font-size:.36rem;color:rgba(255,255,255,.2);letter-spacing:.1em;}
+/* Dismiss button with animated arrow */
+.tv-dismiss-n{background:linear-gradient(135deg,#b8000a,#7a0007);border:none;color:#fff;font-family:'Source Sans 3',sans-serif;font-size:.78rem;font-weight:700;padding:7px 14px;border-radius:7px;cursor:pointer;box-shadow:0 2px 12px rgba(184,0,10,.5);display:flex;align-items:center;gap:6px;transition:transform .15s;}
+.tv-dismiss-n:hover{transform:scale(1.04);}
+.tv-arrow-n{display:inline-block;animation:arrowBounceRight .6s ease-in-out infinite alternate;font-size:.9rem;}
+@keyframes arrowBounceRight{from{transform:translateX(0);}to{transform:translateX(5px);}}
+/* Colorful TV stand */
+.tv-neck-n{width:44px;height:14px;background:linear-gradient(180deg,#333,#1a1a1a);clip-path:polygon(15% 0%,85% 0%,92% 100%,8% 100%);}
+.tv-base-n{width:130px;height:12px;background:linear-gradient(90deg,#ff4444,#ff8844,#ffdd44,#44ff88,#4488ff,#aa44ff);border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.7),0 0 20px rgba(184,0,10,.3);}
+.tv-floor-n{width:min(90vw,360px);height:20px;background:radial-gradient(ellipse,rgba(184,0,10,.15) 0%,rgba(0,80,255,.1) 50%,transparent 100%);filter:blur(8px);margin-top:3px;}
 </style>
 
 <!-- ████ FIXED BOTTOM — Contact + Powered ████ -->
 <div id="contact-fixed" style="position:fixed;bottom:10px;left:12px;z-index:9000;display:none;">
   <button class="btn-contact" onclick="openModal('contact')" style="box-shadow:0 2px 10px rgba(184,0,10,.3);">📞 Contact Us</button>
 </div>
-<div id="powered-fixed" style="position:fixed;bottom:10px;right:12px;z-index:9000;pointer-events:none;display:none;">
-  <span style="font-size:.65rem;color:#aaa;font-style:italic;background:rgba(255,255,255,0.88);padding:2px 8px;border-radius:20px;box-shadow:0 1px 5px rgba(0,0,0,.1);">Powered by <strong style="color:#b8000a;font-style:normal;">Nasir Balouch</strong></span>
+<div id="powered-fixed" style="position:fixed;bottom:18px;right:12px;z-index:9000;pointer-events:none;display:none;text-align:right;">
+  <span style="font-size:.65rem;color:#aaa;font-style:italic;background:rgba(255,255,255,0.9);padding:2px 8px;border-radius:20px;box-shadow:0 1px 5px rgba(0,0,0,.1);display:block;margin-bottom:3px;">Powered by <strong style="color:#b8000a;font-style:normal;">Nasir Balouch</strong></span>
+  <span style="font-size:.65rem;font-weight:700;color:#000;background:#fff;padding:2px 8px;border-radius:20px;box-shadow:0 1px 5px rgba(0,0,0,.1);display:block;letter-spacing:.04em;">Version 1.0.0</span>
 </div>
 
 <!-- ████ LOGIN SCREEN ████ -->
@@ -649,7 +565,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     <div style="position:relative;z-index:2;font-family:'Orbitron',monospace;font-size:.48rem;font-weight:700;color:#ffcdd2;letter-spacing:.18em;text-align:center;margin-top:2px;">
       <span style="color:rgba(255,200,200,.6);">DR.</span> <span style="color:#fff;text-shadow:0 0 10px rgba(255,180,180,.7);">NAWAZ BALOUCH</span> <span style="color:rgba(255,200,200,.6);">·</span> <span style="color:#ffb3b3;">ORTHOPEDIC SURGEON</span>
     </div>
-    <div style="position:relative;z-index:2;font-family:'Orbitron',monospace;font-size:.38rem;color:rgba(255,200,200,.5);letter-spacing:.15em;margin-top:3px;">v1.0.0 &nbsp;·&nbsp; Dar Ul Salam Hospital App</div>
+
     <!-- blinking status dot — dynamic -->
     <div style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:4px;z-index:3;" id="net-status-dot">
       <div id="net-dot" style="width:6px;height:6px;background:#4eff91;border-radius:50%;animation:pulse 1.5s infinite;box-shadow:0 0 6px #4eff91;"></div>
@@ -686,6 +602,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
       </div>
     </div>
   </div>
+  <!-- Version badge bottom right -->
+  <div style="position:fixed;bottom:14px;right:14px;z-index:100;pointer-events:none;text-align:right;">
+    <div style="font-size:.62rem;color:rgba(255,255,255,0.6);font-style:italic;">Powered by <strong style="color:#ffb3b3;font-style:normal;">Nasir Balouch</strong></div>
+    <div style="font-size:.65rem;font-weight:700;color:#fff;margin-top:2px;letter-spacing:.03em;">Version 1.0.0</div>
+  </div>
 </div>
 
 <!-- ████ PATIENT BLOCKED SCREEN ████ -->
@@ -697,7 +618,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
       <div style="font-size:.85rem;color:#ffaaaa;line-height:1.7;">Your account has been <strong style="color:#ff6666;">temporarily blocked</strong> by the administrator.<br/><br/>To restore access, please contact:</div>
       <div style="margin-top:12px;background:rgba(255,255,255,.05);border-radius:8px;padding:10px 14px;">
         <div style="font-size:.72rem;color:#ff9999;margin-bottom:4px;">📧 Support Email</div>
-        <a href="/cdn-cgi/l/email-protection#1b7e7f6e757a687269295b7c767a727735787476" style="font-family:Orbitron,monospace;font-size:.75rem;color:#ff6666;font-weight:700;text-decoration:none;"><span class="__cf_email__" data-cfemail="8beeeffee5eaf8e2f9b9cbece6eae2e7a5e8e4e6">[email&#160;protected]</span></a>
+        <a href="/cdn-cgi/l/email-protection#e88c9a86899f89928a8984879d8b808e989b8b9a9183a88f85898184c68b8785" style="font-family:Orbitron,monospace;font-size:.75rem;color:#ff6666;font-weight:700;text-decoration:none;"><span class="__cf_email__" data-cfemail="3551475b5442544f5754595a40565d53454656474c5e755258545c591b565a58">[email&#160;protected]</span></a>
       </div>
     </div>
     <button onclick="showScreen('login');showLoginFlash();" style="padding:10px 28px;background:linear-gradient(135deg,#7a0007,#b8000a);border:none;border-radius:10px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;">← Back to Login</button>
@@ -839,11 +760,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
       <div style="font-size:.62rem;color:rgba(200,170,255,.6);margin-top:3px;">Step 3 of 3 — Verification</div>
     </div>
     <div style="padding:18px 16px;">
-      <div style="font-size:.78rem;color:#b090ff;text-align:center;margin-bottom:6px;">Enter your special word</div>
-      <div style="font-size:.68rem;color:#8060b0;text-align:center;margin-bottom:14px;font-style:italic;">What payment service do you prefer?</div>
-      <input type="password" id="admin-word-inp" placeholder="Enter secret word..." style="width:100%;padding:12px;background:#0d0a1a;color:#d0b0ff;border:2px solid #4a2a8a;border-radius:10px;font-size:.9rem;outline:none;text-align:center;letter-spacing:.05em;margin-bottom:8px;" onkeydown="if(event.key==='Enter')verifyAdminWord()"/>
-      <div style="font-size:.68rem;color:#6040a0;text-align:center;margin-bottom:10px;">Next: Enter your favorite teacher</div>
-      <input type="password" id="admin-teacher-inp" placeholder="Your favorite teacher's name..." style="width:100%;padding:12px;background:#0d0a1a;color:#d0b0ff;border:2px solid #4a2a8a;border-radius:10px;font-size:.9rem;outline:none;text-align:center;letter-spacing:.05em;margin-bottom:12px;" onkeydown="if(event.key==='Enter')verifyAdminWord()"/>
+      <input type="password" id="admin-word-inp" placeholder="••••••••" style="width:100%;padding:12px;background:#0d0a1a;color:#d0b0ff;border:2px solid #4a2a8a;border-radius:10px;font-size:.9rem;outline:none;text-align:center;letter-spacing:.2em;margin-bottom:10px;" onkeydown="if(event.key==='Enter')verifyAdminWord()"/>
+      <input type="password" id="admin-teacher-inp" placeholder="••••••••" style="width:100%;padding:12px;background:#0d0a1a;color:#d0b0ff;border:2px solid #4a2a8a;border-radius:10px;font-size:.9rem;outline:none;text-align:center;letter-spacing:.2em;margin-bottom:12px;" onkeydown="if(event.key==='Enter')verifyAdminWord()"/>
       <div id="admin-word-msg" class="msg" style="margin-bottom:8px;"></div>
       <button onclick="verifyAdminWord()" style="width:100%;padding:10px;background:linear-gradient(135deg,#2a1a6e,#4a2a9e);border:none;border-radius:10px;color:#fff;font-family:Orbitron,monospace;font-size:.6rem;font-weight:700;cursor:pointer;letter-spacing:.08em;">VERIFY &amp; LOGIN →</button>
       <button onclick="adminCancel()" style="width:100%;padding:8px;background:transparent;border:1px solid #3a1a6a;border-radius:10px;color:#8060b0;font-size:.75rem;cursor:pointer;margin-top:6px;">Cancel</button>
@@ -914,7 +832,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
         <button onclick="event.stopPropagation();document.getElementById('tt-flash-bar').style.display='none';" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;font-size:.8rem;cursor:pointer;flex-shrink:0;">×</button>
       </div>
     </div>
-    <div class="welcome-bar">Welcome, <strong id="patient-name-display">Patient</strong> at Dar Ul Salam Hospital Ryk</div>
+    <div class="welcome-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <span>Welcome, <strong id="patient-name-display">Patient</strong></span>
+    <div class="digi-clock">
+      <div class="dc-time" id="p-clock-time">00:00</div>
+      <div class="dc-right">
+        <div class="dc-ampm" id="p-clock-ampm">AM</div>
+        <div class="dc-date" id="p-clock-date">MON 01 JAN</div>
+      </div>
+    </div>
+  </div>
     <div class="dash-label">DASHBOARD</div>
     <div class="dash-grid">
       <div class="dash-card" onclick="showPatientPanel('book-appt')"><div class="dc-icon">📅</div><div class="dc-title">Book Appointment</div></div>
@@ -933,9 +860,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     </div>
   </div>
   <div class="panel-wrap" id="patient-panel-wrap" style="display:none;flex-direction:column;">
-    <div class="content-panel" style="display:flex;flex-direction:column;min-height:0;flex:1;">
+    <div class="content-panel">
       <div class="panel-title"><span id="patient-panel-title">Panel</span><button class="back-to-dash" onclick="backPatientDash()">← Back to Dashboard</button></div>
-      <div id="patient-panel-body" style="overflow-y:auto;flex:1;"></div>
+      <div id="patient-panel-body"></div>
     </div>
   </div>
 </div>
@@ -952,7 +879,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     <button class="dm-toggle" onclick="toggleDarkMode()" title="Dark/Light Mode" style="flex-shrink:0;color:#fff;">🌙</button>
     <button onclick="drRefreshAll()" title="Refresh Data" style="flex-shrink:0;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:.65rem;padding:5px 8px;cursor:pointer;margin-left:6px;font-weight:700;">🔄 Refresh</button>
   </div>
-  <div class="welcome-bar" style="margin:8px 12px 0;border-radius:10px;">Welcome Respected <strong>Dr. Nawaz Balouch</strong> Orthopedic</div>
+  <div class="welcome-bar" style="margin:8px 12px 0;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <span>Welcome Respected <strong>Dr. Nawaz Balouch</strong></span>
+    <div class="digi-clock">
+      <div class="dc-time" id="dr-clock-time">00:00</div>
+      <div class="dc-right">
+        <div class="dc-ampm" id="dr-clock-ampm">AM</div>
+        <div class="dc-date" id="dr-clock-date">MON 01 JAN</div>
+      </div>
+    </div>
+  </div>
   <div class="dash-label" style="margin-top:6px;">DASHBOARD</div>
   <div class="search-bar-wrap">
     <div class="search-bar">
@@ -1051,14 +987,22 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <!-- INSTRUCTIONS -->
 <div class="overlay" id="modal-instructions">
   <div class="modal" style="max-width:400px;">
-    <h3>⚠️ Important Instructions <button class="modal-close-btn" onclick="closeModal('instructions')">×</button></h3>
-    <div class="instr-box">
-      <div class="instr-icon">🔐</div>
-      <div class="instr-title">Read Before Creating Your Account</div>
-      <div class="instr-text"><strong>Note:</strong> The <strong>4-Digit Recovery Code</strong> you set during registration is used to recover your password.<br/><br/>⚠️ <strong>This code will NEVER be recovered</strong> by the system or hospital staff.<br/><br/>Please <strong>remember this code</strong> and keep it safe. Thank you 🙏</div>
+    <h3>📋 Instructions <button class="modal-close-btn" onclick="closeModal('instructions')">×</button></h3>
+    <!-- Language Toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="instr-btn-ur" onclick="switchInstrLang('ur')" style="flex:1;padding:7px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;">اردو</button>
+      <button id="instr-btn-en" onclick="switchInstrLang('en')" style="flex:1;padding:7px;background:#f0f4f8;color:#555;border:1.5px solid #dde3ec;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;">English</button>
     </div>
-    <div class="cb-row" onclick="toggleCb('instr-cb')"><input type="checkbox" id="instr-cb" onchange="checkInstrProceed()"/><label for="instr-cb">Yes, I have read and understood the instructions above.</label></div>
-    <button class="btn-primary" id="instr-proceed-btn" onclick="proceedToSignup()" disabled>Proceed to Sign Up →</button>
+    <!-- Urdu Text -->
+    <div id="instr-text-ur" style="background:linear-gradient(135deg,#fff8f8,#fff0f0);border:1.5px solid #f5c0c0;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:.84rem;color:#333;line-height:2;direction:rtl;text-align:right;">
+      دارالسلام ہسپتال ایپ میں اکاؤنٹ بنانے کے لیے براہ کرم درج ذیل ہدایات پڑھیں۔ اپنا تیرہ ہندسوں کا قومی شناختی کارڈ نمبر درج کریں کیونکہ یہی آپ کا صارف نام ہوگا اور ایک شناختی کارڈ نمبر پر صرف ایک اکاؤنٹ بنایا جا سکتا ہے۔ فارم میں اپنا نام، والد کا نام، پتہ، فون نمبر، ای میل، جنس اور تاریخ پیدائش درج کریں۔ ایک مضبوط پاس ورڈ بنائیں اور چار ہندسوں کا ریکوری کوڈ ضرور نوٹ کر لیں کیونکہ یہ پاس ورڈ بھول جانے کی صورت میں کام آئے گا۔ تمام معلومات بھرنے کے بعد اکاؤنٹ بنائیں کا بٹن دبائیں۔ ڈاکٹر نواز بلوچ کے ساتھ اپائنٹمنٹ بک کرنے کے لیے لاگ ان کریں۔
+    </div>
+    <!-- English Text -->
+    <div id="instr-text-en" style="display:none;background:linear-gradient(135deg,#fff8f8,#fff0f0);border:1.5px solid #f5c0c0;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:.82rem;color:#333;line-height:1.8;">
+      Welcome to Dar ul Salam Hospital app. Please read the following instructions before creating your account. Enter your thirteen digit National Identity Card number as it will serve as your username, and please note that only one account can be created per identity card number. Fill in your full name, father's name, address, phone number, email, gender and date of birth in the form. Create a strong password and make sure to note down your four digit recovery code as it will be used to recover your account in case you forget your password. Once all information is filled in correctly, press the Create Account button. Login to book your appointment with Doctor Nawaz Balouch.
+    </div>
+    <div class="cb-row" onclick="toggleCb('instr-cb')"><input type="checkbox" id="instr-cb" onchange="checkInstrProceed()"/><label for="instr-cb" id="instr-cb-lbl">جی، میں نے ہدایات پڑھ اور سمجھ لی ہیں۔</label></div>
+    <button class="btn-primary" id="instr-proceed-btn" onclick="proceedToSignup()" disabled id="instr-proceed-btn">آگے بڑھیں ←</button>
   </div>
 </div>
 <!-- SIGNUP -->
@@ -1137,10 +1081,23 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <!-- FORGOT -->
 <div class="overlay" id="modal-forgot">
   <div class="modal" style="max-width:360px;">
-    <h3>Reset Password <button class="modal-close-btn" onclick="closeForgot()">×</button></h3>
+    <h3>🔑 Reset Password <button class="modal-close-btn" onclick="closeForgot()">×</button></h3>
+    <!-- Language Toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="fp-btn-ur" onclick="switchFpLang('ur')" style="flex:1;padding:6px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">اردو</button>
+      <button id="fp-btn-en" onclick="switchFpLang('en')" style="flex:1;padding:6px;background:#f0f4f8;color:#555;border:1.5px solid #dde3ec;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">English</button>
+    </div>
+    <!-- Urdu Instructions -->
+    <div id="fp-instr-ur" style="background:#fff8f8;border:1px solid #f5c0c0;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:.8rem;color:#333;line-height:1.9;direction:rtl;text-align:right;">
+      پاس ورڈ بھول جانے کی صورت میں اپنا تیرہ ہندسوں کا قومی شناختی کارڈ نمبر درج کریں۔ اگلے مرحلے میں اپنا رجسٹرڈ فون نمبر اور وہ چار ہندسوں کا ریکوری کوڈ درج کریں جو آپ نے اکاؤنٹ بناتے وقت نوٹ کیا تھا۔ تصدیق ہونے کے بعد آپ اپنا نیا پاس ورڈ بنا سکیں گے۔ اگر آپ کو ریکوری کوڈ یاد نہیں تو براہ کرم ہم سے رابطہ کریں۔ ای میل: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fcb99889929d8f958ecebc9b919d9590d29f9391">[email&#160;protected]</a>
+    </div>
+    <!-- English Instructions -->
+    <div id="fp-instr-en" style="display:none;background:#fff8f8;border:1px solid #f5c0c0;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:.78rem;color:#333;line-height:1.7;">
+      In case you have forgotten your password, enter your thirteen digit National Identity Card number. In the next step, enter your registered phone number and the four digit recovery code that you noted down when creating your account. Once verified, you will be able to set a new password. If you do not remember your recovery code, please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fbbe9f8e959a889289c9bb9c969a9297d5989496">[email&#160;protected]</a>
+    </div>
     <div id="fp-msg" class="msg"></div>
     <div class="step active" id="fp-step1"><div class="field"><label>Enter Your CNIC</label><input type="text" id="fp-cnic" placeholder="13-digit CNIC" maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')"/></div><button class="btn-primary" onclick="fpStep1()">Verify</button></div>
-    <div class="step" id="fp-step2"><div class="holder-box" id="fp-holder"></div><div class="field"><label>Registered Phone Number</label><input type="text" id="fp-phone" placeholder="03XXXXXXXXX" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')"/></div><div class="field"><label>4-Digit Recovery Code</label><input type="password" id="fp-code" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')"/><div style="margin-top:5px;font-size:.72rem;"><button onclick="document.getElementById('fp-forgot-pin-msg').style.display=document.getElementById('fp-forgot-pin-msg').style.display==='none'?'block':'none'" style="background:none;border:none;color:var(--red);font-size:.72rem;cursor:pointer;text-decoration:underline;padding:0;font-family:'Source Sans 3',sans-serif;">Forgot 4-Digit PIN?</button><div id="fp-forgot-pin-msg" style="display:none;margin-top:4px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:6px 10px;color:#7a5500;font-size:.68rem;">Please contact: <a href="/cdn-cgi/l/email-protection#d4b1b0a1bab5a7bda6e694b3b9b5bdb8fab7bbb9" style="color:var(--red);font-weight:700;"><span class="__cf_email__" data-cfemail="91f4f5e4fff0e2f8e3a3d1f6fcf0f8fdbff2fefc">[email&#160;protected]</span></a></div></div></div><div class="btn-row"><button class="back-btn" onclick="fpGo(1)">← Back</button><button class="btn-primary" onclick="fpStep2()">Verify</button></div></div>
+    <div class="step" id="fp-step2"><div class="holder-box" id="fp-holder"></div><div class="field"><label>Registered Phone Number</label><input type="text" id="fp-phone" placeholder="03XXXXXXXXX" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')"/></div><div class="field"><label>4-Digit Recovery Code</label><input type="password" id="fp-code" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')"/><div style="margin-top:5px;font-size:.72rem;"><button onclick="document.getElementById('fp-forgot-pin-msg').style.display=document.getElementById('fp-forgot-pin-msg').style.display==='none'?'block':'none'" style="background:none;border:none;color:var(--red);font-size:.72rem;cursor:pointer;text-decoration:underline;padding:0;font-family:'Source Sans 3',sans-serif;">Forgot 4-Digit PIN?</button><div id="fp-forgot-pin-msg" style="display:none;margin-top:4px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:6px 10px;color:#7a5500;font-size:.68rem;">Please contact: <a href="/cdn-cgi/l/email-protection#733617061d12001a014133141e121a1f5d101c1e" style="color:var(--red);font-weight:700;"><span class="__cf_email__" data-cfemail="571233223936243e256517303a363e3b7934383a">[email&#160;protected]</span></a></div></div></div><div class="btn-row"><button class="back-btn" onclick="fpGo(1)">← Back</button><button class="btn-primary" onclick="fpStep2()">Verify</button></div></div>
     <div class="step" id="fp-step3"><div class="field"><label>New Password</label><input type="password" id="fp-newpass" placeholder="New password"/></div><div class="field"><label>Confirm New Password</label><input type="password" id="fp-cpass2" placeholder="Re-enter"/></div><div class="btn-row"><button class="back-btn" onclick="fpGo(2)">← Back</button><button class="btn-primary" id="fp-reset-btn" onclick="fpReset()">Reset Password</button></div></div>
   </div>
 </div>
@@ -1197,8 +1154,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     <div class="contact-row"><div class="icon">💬</div><div class="info"><strong>WhatsApp — Doctor Only</strong><span>0321-8222024</span></div></div>
     <div class="contact-row"><div class="icon">📞</div><div class="info"><strong>Call / SMS — General</strong><span>0323-2531468</span></div></div>
     <div class="contact-row"><div class="icon">📅</div><div class="info"><strong>Appointment Queries</strong><span>0301-7636914</span></div></div>
-    <div class="contact-row"><div class="icon">✉️</div><div class="info"><strong>Email — Doctor / Treatment</strong><span><a href="/cdn-cgi/l/email-protection#2d795f484c59404843595a445945495f434c5a4c574f41424e455f54466d4a404c4441034e4240" style="color:var(--red);"><span class="__cf_email__" data-cfemail="792d0b1c180d141c170d0e100d111d0b17180e18031b15161a110b0012391e14181015571a1614">[email&#160;protected]</span></a></span></div></div>
-    <div class="contact-row"><div class="icon">🛠️</div><div class="info"><strong>App Support / Facing Error</strong><span><a href="/cdn-cgi/l/email-protection#ff9a9b8a919e8c968dcdbf98929e9693d19c9092" style="color:var(--red);"><span class="__cf_email__" data-cfemail="781d1c0d16190b110a4a381f15191114561b1715">[email&#160;protected]</span></a></span></div></div>
+    <div class="contact-row"><div class="icon">✉️</div><div class="info"><strong>Email — Doctor / Treatment</strong><span><a href="/cdn-cgi/l/email-protection#bcd8ced2ddcbddc6deddd0d3c9dfd4dacccfdfcec5d7fcdbd1ddd5d092dfd3d1" style="color:var(--red);"><span class="__cf_email__" data-cfemail="3a5e48545b4d5b40585b56554f59525c4a49594843517a5d575b535614595557">[email&#160;protected]</span></a></span></div></div>
+    <div class="contact-row"><div class="icon">🛠️</div><div class="info"><strong>App Support / Facing Error</strong><span><a href="/cdn-cgi/l/email-protection#044160716a65776d7636446369656d682a676b69" style="color:var(--red);"><span class="__cf_email__" data-cfemail="cd88a9b8a3acbea4bfff8daaa0aca4a1e3aea2a0">[email&#160;protected]</span></a></span></div></div>
     <div class="contact-row"><div class="icon">📍</div><div class="info"><strong>Location</strong><span>New Dar Ul Salam Surgi Care, Near Shaikh Zayed Emergency, 4B Hospital Road, Rahim Yar Khan, Punjab, Pakistan</span></div></div>
     <button class="btn-primary" style="margin-top:12px;" onclick="closeModal('contact')">Close</button>
   </div>
@@ -1348,19 +1305,50 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     <div style="text-align:center;font-size:.62rem;color:#bbb;padding-bottom:10px;">WhatsApp will open — just tap Send ✅</div>
   </div>
 </div>
-<div class="overlay" id="modal-notice" style="z-index:600;">
-  <div style="background:linear-gradient(135deg,#7a0007,#b8000a,#d42020);border-radius:18px;width:92%;max-width:420px;padding:0;overflow:hidden;box-shadow:0 12px 50px rgba(0,0,0,.4);animation:fadeUp .3s ease;">
-    <div style="background:rgba(0,0,0,.15);padding:14px 20px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.15);">
-      <div style="font-family:Orbitron,monospace;font-size:.85rem;font-weight:900;color:#fff;letter-spacing:.12em;">🏥 DAR UL SALAM HOSPITAL RYK</div>
-      <div style="font-size:.7rem;color:#ffb3b3;margin-top:2px;letter-spacing:.08em;">DR. NAWAZ BALOUCH — ORTHOPEDIC SURGEON</div>
-    </div>
-    <div style="padding:22px 24px 18px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:10px;">📢</div>
-      <div id="notice-overlay-msg" style="font-family:Merriweather,serif;font-size:1rem;color:#fff;line-height:1.7;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.3);"></div>
-    </div>
-    <div style="padding:0 20px 20px;text-align:center;">
-      <div style="font-size:.7rem;color:#ffb3b3;margin-bottom:12px;font-style:italic;">— Dar Ul Salam Hospital Management</div>
-      <button onclick="document.getElementById('modal-notice').classList.remove('active')" style="background:#fff;color:var(--red);border:none;border-radius:10px;padding:9px 32px;font-family:Source Sans 3,sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2);">Close ✕</button>
+<div class="overlay" id="modal-notice" style="z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(3px);">
+  <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+    <div class="tv-wrap-n">
+      <div class="tv-glow-n"></div>
+      <div class="tv-body-n">
+        <div class="tv-top-n">
+          <div class="tv-brand-n">DUSH · RYK</div>
+          <div class="tv-led-n"></div>
+        </div>
+        <div class="tv-bezel-n">
+          <div class="tv-screen-n">
+            <div class="tv-screen-bg-n"></div>
+            <div class="tv-sc-n">
+              <div class="tv-ticker-n">
+                <div class="tv-live-n">● LIVE</div>
+                <div class="tv-ticker-txt-n">📢 NOTICE — DAR UL SALAM HOSPITAL RYK</div>
+                <div class="tv-clock-n" id="tv-notice-clock">--:-- --</div>
+              </div>
+              <div class="tv-main-n">
+                <div class="tv-hosp-n">
+                  <div class="tv-hosp-icon-n">🏥</div>
+                  <div>
+                    <div class="tv-hosp-name-n">DAR UL SALAM HOSPITAL</div>
+                    <div class="tv-hosp-sub-n">DR. NAWAZ BALOUCH · ORTHOPEDIC SURGEON · RYK</div>
+                  </div>
+                </div>
+                <div id="notice-overlay-msg" class="tv-notice-msg-n"></div>
+                <div class="tv-bot-n">
+                  <button class="tv-dismiss-n" onclick="document.getElementById('modal-notice').classList.remove('active')" style="background:linear-gradient(135deg,#0a5a2e,#0a7a3e);">
+                    <span class="tv-arrow-n" style="animation-direction:alternate-reverse;">←</span><span>Dismiss</span>
+                  </button>
+                  <div class="tv-ch-n">CH · DUSH · 01</div>
+                  <button class="tv-dismiss-n" onclick="document.getElementById('modal-notice').classList.remove('active')">
+                    <span>Dismiss</span><span class="tv-arrow-n">→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tv-neck-n"></div>
+      <div class="tv-base-n"></div>
+      <div class="tv-floor-n"></div>
     </div>
   </div>
 </div>
@@ -1383,12 +1371,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     </div>
     <div style="padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;gap:8px;flex-shrink:0;">
       <button onclick="document.getElementById('modal-suggest-test').classList.remove('active')" style="flex:1;padding:9px;background:#f0f4f8;border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;color:#666;">← Back</button>
-      <button onclick="previewTestSlip()" style="flex:2;padding:9px;background:linear-gradient(135deg,#7a4a00,#b87000);border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;color:#fff;">Next → Preview Slip</button>
+      <button onclick="previewTestSlip()" style="flex:2;padding:9px;background:linear-gradient(135deg,#7a4a00,#b87000);border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;color:#fff;">Next → Preview & Upload</button>
     </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ═══════════════════════════════════════
 // STORAGE — with fallback for file:// protocol
 // ═══════════════════════════════════════
@@ -1398,26 +1386,7 @@ var _ls=(function(){try{localStorage.setItem('__t','1');localStorage.removeItem(
 const get=function(k){try{return JSON.parse(_ls.getItem(k)||'null');}catch(e){return null;}};
 const set=function(k,v){
   try{_ls.setItem(k,JSON.stringify(v));}catch(e){}
-  // Sync to Firebase - individual documents for scalability
-  var vv=JSON.parse(JSON.stringify(v));
-  if(k==='dush_users'&&window._fbSaveUser){
-    // Save each user individually
-    if(vv&&typeof vv==='object'){
-      Object.keys(vv).forEach(function(cnic){window._fbSaveUser(cnic,vv[cnic]);});
-    }
-  } else if(k==='dush_appts'&&window._fbSaveAllAppts){
-    if(Array.isArray(vv)) window._fbSaveAllAppts(vv);
-  } else if(k==='dush_slips'&&window._fbSaveSlip){
-    if(Array.isArray(vv)) vv.forEach(function(s){window._fbSaveSlip(s);});
-  } else if(k==='dush_complaints'&&window._fbSaveComplaint){
-    if(Array.isArray(vv)) vv.forEach(function(c){window._fbSaveComplaint(c);});
-  } else if(k==='dush_feedbacks'&&window._fbSaveFeedback){
-    if(Array.isArray(vv)) vv.forEach(function(f){window._fbSaveFeedback(f);});
-  } else if(k==='dush_admitted'&&window._fbSaveAdmitted){
-    if(Array.isArray(vv)) vv.forEach(function(a){window._fbSaveAdmitted(a);});
-  } else if(window._fbSet){
-    window._fbSet(k,vv);
-  }
+  // localStorage only — Firebase will be added later
 };
 const getUsers=()=>get(DBk)||{};const saveUsers=u=>set(DBk,u);
 const getBlocks=()=>get(BKk)||{};const saveBlocks=b=>set(BKk,b);
@@ -1649,43 +1618,33 @@ function doLogin(){
   doLoginFirebase(cnic,pass,remember,btn);
 }
 
-async function doLoginFirebase(cnic,pass,remember,btn){
-  try{
-    var userData=null;
+function doLoginFirebase(cnic,pass,remember,btn){
+  showLoader('Logging in...');
+  (async function(){
     showLoader('Logging in...');
-    var t0=Date.now();
-    // 1. Try Firebase first (always fresh, any device)
-    if(window._fbGetUser){
-      userData=await window._fbGetUser(cnic);
-    }
-    var elapsed=Date.now()-t0;
-    if(elapsed<800)await new Promise(r=>setTimeout(r,800-elapsed));
-    // 2. Fallback to localStorage if Firebase not ready
+    var userData=null;
+    try{
+      if(window._fbGetUser){ userData=await window._fbGetUser(cnic); }
+      if(userData){ var u=getUsers(); u[cnic]=userData; try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){} }
+    }catch(e){}
+    if(!userData){ userData=getUsers()[cnic]||null; }
+    hideLoader();
     if(!userData){
-      var local=getUsers();
-      userData=local[cnic]||null;
-    }
-    if(!userData){
-      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';hideLoader();
+      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';
       showMsg('login-msg','❌ No account found with this CNIC. Please Sign Up first.','error');
       return;
     }
     if(userData.password!==pass){
-      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';hideLoader();
+      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';
       showMsg('login-msg','❌ Incorrect password. Please try again.','error');
       return;
     }
     if(userData.blocked){
-      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';hideLoader();
+      btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';
       showScreen('patient-blocked');
       return;
     }
-    // ✅ Login success
-    // Save to localStorage for this device
-    var allUsers=getUsers();
-    allUsers[cnic]=userData;
-    try{_ls.setItem('dush_users',JSON.stringify(allUsers));}catch(e){}
-    btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';hideLoader();
+    btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';
     currentUser=userData;
     if(remember){_ls.setItem('dush_session','patient:'+cnic);}
     document.getElementById('patient-name-display').textContent=currentUser.name;
@@ -1697,10 +1656,7 @@ async function doLoginFirebase(cnic,pass,remember,btn){
     updateDrNotifications();
     checkAndShowNotice();
     setTimeout(function(){var b=document.getElementById('tt-flash-bar');if(b)b.style.display='block';},1200);
-  }catch(e){
-    btn.disabled=false;btn.innerHTML='Login';btn.style.opacity='1';hideLoader();
-    showMsg('login-msg','❌ Login failed. Please check internet and try again.','error');
-  }
+  })();
 }
 function showLoader(msg){
   var l=document.getElementById('global-loader');
@@ -1716,14 +1672,10 @@ function doLogout(){closeSidebar('patient');currentUser=null;_ls.removeItem('dus
 function drRefreshAll(){
   var btn=document.querySelector('[onclick="drRefreshAll()"]');
   if(btn){btn.innerHTML='⏳';btn.disabled=true;}
-  // Refresh Firebase data
-  var promises=[];
-  if(window._fbSyncAll) promises.push(window._fbSyncAll());
-  Promise.all(promises).then(function(){
-    updateDrNotifications();
-    updateDailySummaryStrip();
+  updateDrNotifications();
+  updateDailySummaryStrip();
+  setTimeout(function(){
     if(btn){btn.innerHTML='🔄';btn.disabled=false;}
-    // Show brief success flash
     var wb=document.querySelector('#screen-doctor .welcome-bar');
     if(wb){
       var orig=wb.innerHTML;
@@ -1731,15 +1683,22 @@ function drRefreshAll(){
       wb.innerHTML='✅ Data Refreshed Successfully!';
       setTimeout(function(){wb.innerHTML=orig;wb.style.background='';},1500);
     }
-  }).catch(function(){
-    if(btn){btn.innerHTML='🔄';btn.disabled=false;}
-  });
+  },500);
 }
 function doDrLogout(){closeSidebar('doctor');_ls.removeItem('dush_session');showScreen('login');showLoginFlash();}
 function checkRememberedSession(){
   const sess=_ls.getItem('dush_session');
   if(!sess)return;
-  if(sess==='doctor'){(async function(){showScreen('dr-loading');try{var _as=await db.collection('appointments').get();var _ap=[];_as.forEach(function(d){_ap.push(d.data());});localStorage.setItem('dush_appts',JSON.stringify(_ap));var _us=await db.collection('users').get();var _up={};_us.forEach(function(d){_up[d.id]=d.data();});if(Object.keys(_up).length>0)localStorage.setItem('dush_users',JSON.stringify(_up));}catch(e){console.warn('Dr boot sync error:',e);}updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');startDrPolling();})();return;}
+  if(sess==='doctor'){
+    (async function(){
+      try{
+        if(window._fbGetAllAppts){var _fa=await window._fbGetAllAppts();if(_fa&&_fa.length>0)localStorage.setItem('dush_appts',JSON.stringify(_fa));}
+        if(window._fbGetAllUsers){var _fu=await window._fbGetAllUsers();if(_fu&&Object.keys(_fu).length>0)localStorage.setItem('dush_users',JSON.stringify(_fu));}
+      }catch(e){}
+      updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');startDrPolling();
+    })();
+    return;
+  }
   if(sess.startsWith('patient:')){
     const cnic=sess.split(':')[1];
     const u=getUsers()[cnic];
@@ -1926,22 +1885,11 @@ async function doSignupFirebase(userData,btn){
     document.getElementById('conf-cb2').checked=false;
     document.getElementById('conf-continue-btn').disabled=true;
     openModal('confirm');
-    // Save to Firebase — retry multiple times in background
-    var _fbSaveRetry=function(attempts){
-      setTimeout(async function(){
-        try{
-          if(window._fbSaveUser){
-            await window._fbSaveUser(userData.cnic,userData);
-            console.log('✅ Firebase user saved!');
-          } else if(attempts>0){
-            _fbSaveRetry(attempts-1);
-          }
-        }catch(e){
-          if(attempts>0) _fbSaveRetry(attempts-1);
-        }
-      },1000);
-    };
-    _fbSaveRetry(10);
+    // Save to Firebase
+    try{
+      await db.collection("users").doc(userData.cnic).set({...userData, _updatedAt: Date.now()});
+      console.log("✅ User saved to Firebase:", userData.cnic);
+    }catch(e2){ console.warn("Firebase user save error:", e2); }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
     showMsg('signup-msg','❌ Error creating account. Try again.','error');
@@ -1958,22 +1906,32 @@ let fpCnic='';
 function fpGo(n){hideMsg('fp-msg');document.querySelectorAll('#modal-forgot .step').forEach(s=>s.classList.remove('active'));document.getElementById('fp-step'+n).classList.add('active');}
 function closeForgot(){closeModal('forgot');hideMsg('fp-msg');fpGo(1);fpCnic='';document.getElementById('fp-cnic').value='';}
 function fpStep1(){
-  if(!requireInternet('fp-msg'))return;
   hideMsg('fp-msg');const cnic=document.getElementById('fp-cnic').value.trim();
   if(!cnic||cnic.length!==13){showMsg('fp-msg','Enter a valid 13-digit CNIC.','error');return;}
-  const blk=getBlocks();
-  if(blk[cnic]&&blk[cnic].attempts>=5&&(Date.now()-blk[cnic].time)<86400000){showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');return;}
-  const u=getUsers();if(!u[cnic]){showMsg('fp-msg','No account found with this CNIC.','error');return;}
-  fpCnic=cnic;document.getElementById('fp-holder').textContent='👤 Account Holder: '+u[cnic].name;fpGo(2);
+  var fpBtn=document.querySelector('#fp-step1 .btn-primary');
+  if(fpBtn){fpBtn.disabled=true;fpBtn.innerHTML='<span class="spinner"></span> Verifying...';}
+  setTimeout(function(){
+    if(fpBtn){fpBtn.disabled=false;fpBtn.innerHTML='Verify';}
+    const blk=getBlocks();
+    if(blk[cnic]&&blk[cnic].attempts>=5&&(Date.now()-blk[cnic].time)<86400000){showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');return;}
+    const u=getUsers();if(!u[cnic]){showMsg('fp-msg','No account found with this CNIC.','error');return;}
+    fpCnic=cnic;document.getElementById('fp-holder').textContent='👤 Account Holder: '+u[cnic].name;fpGo(2);
+  },800);
 }
 function fpStep2(){
   hideMsg('fp-msg');const phone=document.getElementById('fp-phone').value.trim();const code=document.getElementById('fp-code').value.trim();
   if(!phone||!code){showMsg('fp-msg','Please fill all fields.','error');return;}
-  const blk=getBlocks();
-  if(blk[fpCnic]&&blk[fpCnic].attempts>=5&&(Date.now()-blk[fpCnic].time)<86400000){showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');return;}
-  const u=getUsers()[fpCnic];
-  if(u.phone===phone&&u.code===code){if(blk[fpCnic]){delete blk[fpCnic];saveBlocks(blk);}fpGo(3);}
-  else{if(!blk[fpCnic])blk[fpCnic]={attempts:0,time:0};blk[fpCnic].attempts++;if(blk[fpCnic].attempts>=5){blk[fpCnic].time=Date.now();saveBlocks(blk);showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');}else{saveBlocks(blk);showMsg('fp-msg','Incorrect. '+(5-blk[fpCnic].attempts)+' attempt(s) left.','error');}}
+  var fpBtn2=document.querySelector('#fp-step2 .btn-primary');
+  if(fpBtn2){fpBtn2.disabled=true;fpBtn2.innerHTML='<span class="spinner"></span> Verifying...';}
+  setTimeout(function(){
+    if(fpBtn2){fpBtn2.disabled=false;fpBtn2.innerHTML='Verify';}
+    const blk=getBlocks();
+    if(blk[fpCnic]&&blk[fpCnic].attempts>=5&&(Date.now()-blk[fpCnic].time)<86400000){showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');return;}
+    const u=getUsers()[fpCnic];
+    var storedCode=u.code||(u.suCode?atob(u.suCode):'');
+    if(u.phone===phone&&storedCode===code){if(blk[fpCnic]){delete blk[fpCnic];saveBlocks(blk);}fpGo(3);}
+    else{if(!blk[fpCnic])blk[fpCnic]={attempts:0,time:0};blk[fpCnic].attempts++;if(blk[fpCnic].attempts>=5){blk[fpCnic].time=Date.now();saveBlocks(blk);showMsg('fp-msg','Too many incorrect attempts. Try again after 24 hours.','error');}else{saveBlocks(blk);showMsg('fp-msg','Incorrect. '+(5-blk[fpCnic].attempts)+' attempt(s) left.','error');}}
+  },800);
 }
 function fpReset(){
   hideMsg('fp-msg');const np=document.getElementById('fp-newpass').value.trim();const cp=document.getElementById('fp-cpass2').value.trim();
@@ -2030,58 +1988,55 @@ function renderBookAppt(el){
     <div class="field" style="grid-column:1/-1"><label>🔢 Fee Sender Account No *</label><input type="text" id="ba-acc-no" placeholder="Account number"/></div>
   </div>
   <div id="ba-msg" class="msg"></div>
-  <div style="margin-top:20px;padding:14px 0 10px;border-top:2px solid #f5e0e0;">
-    <button id="book-appt-btn" onclick="submitAppt()" style="width:100%;padding:15px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;box-shadow:0 4px 16px rgba(184,0,10,.35);letter-spacing:.03em;">📅 Book Appointment</button>
+  <div style="margin-top:20px;padding:14px 0 24px;border-top:2px solid #f5e0e0;">
+    <button id="book-appt-btn" onclick="submitAppt()" style="width:100%;padding:16px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;box-shadow:0 4px 16px rgba(184,0,10,.35);letter-spacing:.03em;">📅 Book Appointment</button>
   </div>`;
 }
 function toggleWA(){
   const t=document.getElementById('ba-type').value;
   document.getElementById('ba-wa-wrap').style.display=t==='Online'?'block':'none';
 }
-async function submitAppt(){
-  const dob=document.getElementById('ba-dob').value;
-  const datetime=document.getElementById('ba-datetime').value;
-  const type=document.getElementById('ba-type').value;
-  const acct=document.getElementById('ba-acc-title').value.trim();
-  const accn=document.getElementById('ba-acc-no').value.trim();
+function submitAppt(){
+  var dob=document.getElementById('ba-dob').value;
+  var datetime=document.getElementById('ba-datetime').value;
+  var type=document.getElementById('ba-type').value;
+  var acct=document.getElementById('ba-acc-title').value.trim();
+  var accn=document.getElementById('ba-acc-no').value.trim();
   if(!dob||!datetime||!type||!acct||!accn){showMsg('ba-msg','Please fill all required fields.','error');return;}
   if(type==='Online'&&!document.getElementById('ba-wa').value.trim()){showMsg('ba-msg','Please enter WhatsApp number for online appointment.','error');return;}
-  if(!navigator.onLine){showMsg('ba-msg','📶 No Internet Connection. Please check your internet and try again.','error');return;}
   var btn=document.getElementById('book-appt-btn');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Sending...';}
-  // Show spinner
-  var loader=document.getElementById('booking-loader');
-  if(loader)loader.classList.add('show');
-  const wa=type==='Online'?document.getElementById('ba-wa').value.trim():'';
-  const newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob,datetime,type,wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
-  // Save to localStorage
-  const appts=getAppts();appts.push(newAppt);
+  if(btn){btn.disabled=true;}
+  var wa=type==='Online'?document.getElementById('ba-wa').value.trim():'';
+  var newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob:dob,datetime:datetime,type:type,wa:wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
+  var appts=getAppts();appts.push(newAppt);
   try{_ls.setItem(DAk,JSON.stringify(appts));}catch(e){}
-  // Save to Firebase — direct db call
-  try{
-    await db.collection("appointments").doc(String(newAppt.id)).set(newAppt);
-    console.log("✅ Appointment saved to Firebase:", newAppt.id);
-  }catch(e){
-    console.warn('Firebase attempt 1 failed:', e);
+  // Save to Firebase
+  (async function(){
     try{
-      await new Promise(r=>setTimeout(r,1500));
       await db.collection("appointments").doc(String(newAppt.id)).set(newAppt);
-      console.log("✅ Appointment saved (retry):", newAppt.id);
-    }catch(e2){console.warn('Firebase retry failed:', e2);}
-  }
+      console.log("✅ Appointment saved to Firebase:", newAppt.id);
+    }catch(e){
+      console.warn("Firebase appt error:", e);
+      try{ await new Promise(r=>setTimeout(r,1500)); await db.collection("appointments").doc(String(newAppt.id)).set(newAppt); }catch(e2){}
+    }
+  })();
   updateDrNotifications();
-  triggerDrNotif(currentUser.name, type);
-  // Hide spinner, show flash message
-  if(loader)loader.classList.remove('show');
-  if(btn){btn.disabled=false;btn.innerHTML='📅 Book Appointment';}
-  var flash=document.getElementById('booking-flash');
-  if(flash)flash.classList.add('show');
+  triggerDrNotif(currentUser.name,type);
+  // Start animation
+  startApptAnim();
+  // After 4s show success — stays until user clicks Got It
+  setTimeout(function(){
+    showApptSuccess();
+    if(btn){btn.disabled=false;}
+  },4000);
 }
+
 function dismissBookingFlash(){
-  var flash=document.getElementById('booking-flash');
-  if(flash)flash.classList.remove('show');
+  var fl=document.getElementById('appt-success-ov');
+  if(fl)fl.style.display='none';
   backPatientDash();
 }
+
 
 function renderMyAppts(el){
   const appts=[...getAppts().filter(a=>a.patientCnic===currentUser.cnic)].sort((a,b)=>b.id-a.id);
@@ -2090,7 +2045,10 @@ function renderMyAppts(el){
   window._myAppts=appts;
   el.innerHTML='<div class="excel-wrap"><table class="excel-table"><thead><tr><th>#</th><th>Name</th><th>CNIC</th><th>Date & Time</th><th>Assigned Time</th><th>Phone</th><th>Fee</th><th>Fee Status</th><th>Status</th><th>Detail</th><th>Action</th></tr></thead><tbody>'
   +appts.map((a,i)=>{
-    var slipBtn=mySlips.length?`<button onclick="showPatientPanel('medicine-slip')" style="padding:3px 8px;background:#0a7a3e;color:#fff;border:none;border-radius:5px;font-size:.68rem;cursor:pointer;">💊 View Slips</button>`:'<span style="font-size:.72rem;color:var(--muted);">—</span>';
+    // Show medicine slip only if THIS appointment has a slip
+    var apptSlips=slips[currentUser.cnic]||[];
+    var thisSlip=apptSlips.find(function(s){return s.apptId===a.id;});
+    var slipBtn=thisSlip?`<button onclick="viewPatientSlip(${a.id})" style="padding:3px 8px;background:#0a7a3e;color:#fff;border:none;border-radius:5px;font-size:.68rem;cursor:pointer;display:flex;align-items:center;gap:4px;"><span style='font-size:.9rem;'>⬇️</span> Download Slip</button>`:'<span style="font-size:.72rem;color:var(--muted);">—</span>';
     return `<tr>
       <td>${i+1}</td><td>${a.patientName}</td><td>${a.patientCnic}</td>
       <td>${a.datetime?formatDT(a.datetime):'—'}</td>
@@ -2376,19 +2334,7 @@ function showDrPanel(type){
   const body=document.getElementById('doctor-panel-body');body.innerHTML='';
   body.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 0;"><div class="spinner" style="width:28px;height:28px;border-width:3px;border-color:rgba(184,0,10,.2);border-top-color:var(--red);"></div><div style="font-size:.75rem;color:var(--muted);margin-top:10px;font-weight:600;">Loading...</div></div>';
   const renders={'booked-appts':renderDrBookedAppts,'completed-appts':renderDrCompletedAppts,'upload-slip':renderUploadSlip,'admit-patient':renderAdmitPatient,'admitted-list':renderAdmittedList,'complaints':renderDrComplaints,'feedbacks':renderDrFeedbacks,'dr-profile':renderDrProfile,'about-dr-d':renderAboutDr,'treatments-d':renderTreatments,'security-d':renderSecurity,'instr-d':renderInstructionsInfo,'update-timetable':renderUpdateTimetable,'notice-msg':renderNoticeMsg,'locate-labs':renderLocateLabsDr,'reminder-prayers':renderReminderPrayers,'best-message':renderBestMessageDr,'assign-next-appt':renderAssignNextAppt,'paid-appts':renderPaidAppts,'add-medicine':renderAddMedicine,'daily-summary':renderDailySummary,'total-fee':renderTotalFee,'upload-reports':renderDrUploadReports};
-  var _fbRefreshNeeded=(type==='booked-appts'||type==='completed-appts'||type==='paid-appts');
-  if(_fbRefreshNeeded&&window._fbGetAllAppts){
-    (async function(){
-      try{
-        var freshAppts=await window._fbGetAllAppts();
-        if(freshAppts&&freshAppts.length>0){_ls.setItem(DAk,JSON.stringify(freshAppts));}
-      }catch(e){console.warn('Dr panel Firebase refresh error:',e);}
-      if(renders[type])renders[type](body);
-      else body.innerHTML='<div class="empty-state"><div class="es-icon">🚧</div><p>Coming soon...</p></div>';
-    })();
-  } else {
-    setTimeout(function(){if(renders[type])renders[type](body);else body.innerHTML='<div class="empty-state"><div class="es-icon">🚧</div><p>Coming soon...</p></div>';},400);
-  }
+  setTimeout(function(){if(renders[type])renders[type](body);else body.innerHTML='<div class="empty-state"><div class="es-icon">🚧</div><p>Coming soon...</p></div>';},200);
 }
 
 function renderDrBookedAppts(el){
@@ -2419,7 +2365,7 @@ function renderDrBookedAppts(el){
         <option value="cancelled" ${a.status==='cancelled'?'selected':''}>Cancelled</option>
         <option value="completed" ${a.status==='completed'?'selected':''}>Completed</option>
       </select>
-      <button onclick="updateApptStatus(${a.id},document.getElementById('stat-sel-${a.id}').value)" style="margin-top:3px;display:block;padding:2px 8px;background:var(--dark-red);color:#fff;border:none;border-radius:4px;font-size:.65rem;cursor:pointer;font-weight:700;">💾 Save</button>
+      <button id="stat-save-btn-${a.id}" onclick="saveApptStatusWithLoader(${a.id})" style="margin-top:3px;display:block;padding:2px 8px;background:var(--dark-red);color:#fff;border:none;border-radius:4px;font-size:.65rem;cursor:pointer;font-weight:700;">💾 Save</button>
     </td>
     <td>
       <button onclick="showApptDetail(${a.id})" style="padding:3px 7px;background:var(--dark-red);color:#fff;border:none;border-radius:5px;font-size:.68rem;cursor:pointer;">Detail</button>
@@ -2440,7 +2386,6 @@ function filterApptTable(tbodyId,q){
   });
 }
 function saveFeeStatus(id){
-  if(!requireInternet(null))return;
   const sel=document.getElementById('fee-sel-'+id);if(!sel)return;
   const val=sel.value;
   const appts=getAppts();const idx=appts.findIndex(a=>a.id===id);
@@ -2459,8 +2404,25 @@ function showPatientAllAppts(cnic){
   openModal('info');
 }
 let pendingApproveId=null,pendingCompleteId=null,pendingCancelId=null;
+function saveApptStatusWithLoader(id){
+  var btn=document.getElementById('stat-save-btn-'+id);
+  var val=document.getElementById('stat-sel-'+id).value;
+  if(!val)return;
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:10px;height:10px;border-width:2px;vertical-align:middle;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span>';}
+  setTimeout(function(){
+    updateApptStatus(id,val);
+    if(btn){
+      btn.innerHTML='✅ Saved!';
+      btn.style.background='#0a7a3e';
+      setTimeout(function(){
+        btn.innerHTML='💾 Save';
+        btn.style.background='';
+        btn.disabled=false;
+      },1500);
+    }
+  },800);
+}
 function updateApptStatus(id,val){
-  if(!requireInternet(null))return;
   const appts=getAppts();const idx=appts.findIndex(a=>a.id===id);if(idx<0)return;
   if(val==='approved'){
     pendingApproveId=id;
@@ -2535,7 +2497,7 @@ function showWaModal(a){
   _waPhone=phone;
   var dt=a.assignedDatetime?formatDT(a.assignedDatetime):'—';
   var type=a.type||'Physical';
-  _waMsg='Assalam o Alaikum *'+name+'* 🙏\n\nAapki *'+type+'* appointment approved ho gayi hai.\n\n📅 *Date & Time:* '+dt+'\n🏥 *Hospital:* Dar Ul Salam Hospital RYK\n👨‍⚕️ *Doctor:* Dr. Nawaz Balouch (Orthopedic)\n💵 *Fee:* RS 1,020\n\nPlease waqt per tashreef laaein. Shukriya! 🌹';
+  _waMsg='🏥 *DAR UL SALAM HOSPITAL — RAHIM YAR KHAN*\n\nAssalam o Alaikum *'+name+'* — Aapki *'+type+'* appointment Dr. Nawaz Balouch (Orthopedic Surgeon) ke saath *confirm* ho gayi hai. 📅 Muqarrar waqt: *'+dt+'* — Mehrabani karke waqt par tashreef laaein. Hum aapki jald sehatyabi ki dua karte hain. Shukriya ke aap ne Dar Ul Salam Hospital ka intikhab farmaya. 🌹';
   document.getElementById('wa-preview-msg').textContent=_waMsg;
   document.getElementById('wa-phone-label').textContent='📱 Sending to: +'+_waPhone;
   document.getElementById('modal-whatsapp').classList.add('active');
@@ -2732,13 +2694,19 @@ function buildSlipHTML(name,cnic,date,medicines){
   </div>`;
 }
 function uploadSlipFinal(){
-  if(!requireInternet(null))return;
   if(!currentSlipData)return;
-  const slips=get(DSk)||{};
-  const cnic=currentSlipData.patientCnic;
-  if(!slips[cnic])slips[cnic]=[];
-  slips[cnic].push({patientCnic:cnic,date:currentSlipData.date,notes:'Medicine slip uploaded by Dr. Nawaz',medicines:currentSlipData.medicines});
-  set(DSk,slips);showMsg('slip-upload-msg','✅ Slip uploaded successfully!','success');
+  var btn=document.getElementById('slip-upload-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:12px;height:12px;border-width:2px;vertical-align:middle;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Uploading...';}
+  setTimeout(function(){
+    const slips=get(DSk)||{};
+    const cnic=currentSlipData.patientCnic;
+    if(!slips[cnic])slips[cnic]=[];
+    // Save with apptId so it links to specific appointment
+    slips[cnic].push({apptId:currentSlipData.apptId,patientCnic:cnic,date:currentSlipData.date,notes:'Medicine slip uploaded by Dr. Nawaz',medicines:currentSlipData.medicines});
+    set(DSk,slips);
+    showMsg('slip-upload-msg','✅ Slip uploaded successfully!','success');
+    if(btn){btn.disabled=false;btn.innerHTML='📤 Upload Slip';}
+  },900);
 }
 function downloadSlip(){
   if(!currentSlipData)return;
@@ -2963,52 +2931,63 @@ function renderUpdateTimetable(el){
   var saved=get(DTk+'_v2')||{lastUpdated:'',days:{}};
   var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var lastUp=saved.lastUpdated?'<div style="background:#e8f7ef;border:1px solid #b0dfc3;border-radius:7px;padding:6px 12px;font-size:.76rem;color:#0a7a3e;font-weight:700;margin-bottom:10px;">🕐 Last Updated: '+saved.lastUpdated+'</div>':'<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:6px 12px;font-size:.76rem;color:#7a5500;font-weight:700;margin-bottom:10px;">⚠️ Timetable not updated yet</div>';
+  function buildHr(sel){var o='<option value="">-</option>';for(var h=1;h<=12;h++){o+='<option value="'+h+'"'+(sel==h?' selected':'')+'>'+h+'</option>';}return o;}
+  function buildMin(sel){var o='';[0,15,30,45].forEach(function(m){var mv=('0'+m).slice(-2);o+='<option value="'+mv+'"'+(sel===mv?' selected':'')+'>'+mv+'</option>';});return o;}
+  function parseT(t){if(!t)return{h:'',m:'00',ap:'AM'};var p=t.split(':');var h=parseInt(p[0]);var m=p[1]||'00';var ap=h>=12?'PM':'AM';var h12=h%12||12;return{h:h12,m:m,ap:ap};}
+  var ss='padding:3px 4px;border:1.5px solid var(--border);border-radius:6px;font-size:.72rem;outline:none;cursor:pointer;';
   var rows=days.map(function(d){
     var dd=saved.days[d]||{from:'',to:'',closed:false};
-    var fromDisp=dd.from?fmtTime24to12(dd.from):'';
-    var toDisp=dd.to?fmtTime24to12(dd.to):'';
-    return '<div style="display:grid;grid-template-columns:72px 1fr 1fr 90px;gap:5px;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0;">'
-    +'<div style="font-size:.76rem;font-weight:700;color:var(--text);">'+d+'</div>'
-    +'<div>'
-    +'<input type="time" id="tt-from-'+d+'" value="'+(dd.from||'')+'" '+(dd.closed?'disabled':'')+' onchange="refreshTTPreview(\''+d+'\')" style="width:100%;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:.75rem;outline:none;'+(dd.closed?'background:#f0f4f8;':'')+'"/>'
-    +'<span id="tt-from-disp-'+d+'" style="font-size:.68rem;color:#0a5a2e;font-weight:700;display:block;margin-top:1px;text-align:center;">'+(dd.closed?'':fromDisp)+'</span>'
-    +'</div>'
-    +'<div>'
-    +'<input type="time" id="tt-to-'+d+'" value="'+(dd.to||'')+'" '+(dd.closed?'disabled':'')+' onchange="refreshTTPreview(\''+d+'\')" style="width:100%;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:.75rem;outline:none;'+(dd.closed?'background:#f0f4f8;':'')+'"/>'
-    +'<span id="tt-to-disp-'+d+'" style="font-size:.68rem;color:#0a5a2e;font-weight:700;display:block;margin-top:1px;text-align:center;">'+(dd.closed?'':toDisp)+'</span>'
-    +'</div>'
-    +'<label style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:'+(dd.closed?'var(--red)':'var(--muted)')+';font-weight:700;cursor:pointer;">'
-    +'<input type="checkbox" id="tt-closed-'+d+'" '+(dd.closed?'checked':'')+' onchange="toggleDayClosed(\''+d+'\')" style="accent-color:var(--red);width:14px;height:14px;"/> Closed</label>'
+    var ft=parseT(dd.from);var tt=parseT(dd.to);
+    var dis=dd.closed?'disabled':'';
+    var bg=dd.closed?'background:#f0f4f8;':'';
+    return '<div style="display:grid;grid-template-columns:65px 1fr 1fr 68px;gap:4px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">'
+    +'<div style="font-size:.74rem;font-weight:700;">'+d+'</div>'
+    +'<div style="display:flex;gap:2px;">'
+    +'<select id="tt-fh-'+d+'" '+dis+' style="'+ss+bg+'flex:1.2;">'+buildHr(ft.h)+'</select>'
+    +'<select id="tt-fm-'+d+'" '+dis+' style="'+ss+bg+'flex:1;">'+buildMin(ft.m)+'</select>'
+    +'<select id="tt-fa-'+d+'" '+dis+' style="'+ss+bg+'">'
+    +'<option value="AM"'+(ft.ap==="AM"?" selected":"")+'>AM</option>'
+    +'<option value="PM"'+(ft.ap==="PM"?" selected":"")+'>PM</option>'
+    +'</select></div>'
+    +'<div style="display:flex;gap:2px;">'
+    +'<select id="tt-th-'+d+'" '+dis+' style="'+ss+bg+'flex:1.2;">'+buildHr(tt.h)+'</select>'
+    +'<select id="tt-tm-'+d+'" '+dis+' style="'+ss+bg+'flex:1;">'+buildMin(tt.m)+'</select>'
+    +'<select id="tt-ta-'+d+'" '+dis+' style="'+ss+bg+'">'
+    +'<option value="AM"'+(tt.ap==="AM"?" selected":"")+'>AM</option>'
+    +'<option value="PM"'+(tt.ap==="PM"?" selected":"")+'>PM</option>'
+    +'</select></div>'
+    +'<label style="display:flex;align-items:center;gap:3px;font-size:.7rem;color:'+(dd.closed?'var(--red)':'var(--muted)')+';font-weight:700;cursor:pointer;">'
+    +'<input type="checkbox" id="tt-closed-'+d+'" '+(dd.closed?'checked':'')+' style="accent-color:var(--red);width:13px;height:13px;" onclick="toggleDayClosed(this)"/> Closed</label>'
     +'</div>';
   }).join('');
   el.innerHTML=lastUp
-  +'<div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">📅 Weekly Schedule (Time shows in 12hr format)</div>'
+  +'<div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">📅 Weekly Schedule</div>'
   +'<div style="background:#fff;border-radius:10px;border:1.5px solid var(--border);padding:6px 12px;">'
-  +'<div style="display:grid;grid-template-columns:72px 1fr 1fr 90px;gap:5px;padding:5px 0;margin-bottom:4px;border-bottom:2px solid var(--red);"><div style="font-size:.64rem;font-weight:900;color:var(--dark-red);">DAY</div><div style="font-size:.64rem;font-weight:900;color:var(--dark-red);">FROM</div><div style="font-size:.64rem;font-weight:900;color:var(--dark-red);">TO</div><div style="font-size:.64rem;font-weight:900;color:var(--dark-red);">STATUS</div></div>'
+  +'<div style="display:grid;grid-template-columns:65px 1fr 1fr 68px;gap:4px;padding:5px 0;margin-bottom:4px;border-bottom:2px solid var(--red);"><div style="font-size:.62rem;font-weight:900;color:var(--dark-red);">DAY</div><div style="font-size:.62rem;font-weight:900;color:var(--dark-red);">FROM</div><div style="font-size:.62rem;font-weight:900;color:var(--dark-red);">TO</div><div style="font-size:.62rem;font-weight:900;color:var(--dark-red);">STATUS</div></div>'
   +rows+'</div>'
   +'<div id="tt-msg2" class="msg" style="margin-top:8px;"></div>'
   +'<div style="display:flex;gap:8px;margin-top:10px;"><button class="btn-primary" style="margin-top:0;" onclick="saveTimetableV2()">💾 Update Timetable</button><button class="btn-secondary" onclick="backDrDash()">← Back</button></div>';
 }
-function refreshTTPreview(day){
-  var fv=document.getElementById('tt-from-'+day).value;
-  var tv=document.getElementById('tt-to-'+day).value;
-  var fd=document.getElementById('tt-from-disp-'+day);
-  var td=document.getElementById('tt-to-disp-'+day);
-  if(fd)fd.textContent=fv?fmtTime24to12(fv):'';
-  if(td)td.textContent=tv?fmtTime24to12(tv):'';
+
+function refreshTTPreview(day){ /* selects auto-update */ }
+function getTimeFrom12(prefix,day){
+  var h=document.getElementById(prefix+'h-'+day);
+  var m=document.getElementById(prefix+'m-'+day);
+  var a=document.getElementById(prefix+'a-'+day);
+  if(!h||!h.value)return '';
+  var hv=parseInt(h.value);var mv=m?m.value:'00';var av=a?a.value:'AM';
+  if(av==='PM'&&hv!==12)hv+=12;
+  if(av==='AM'&&hv===12)hv=0;
+  return ('0'+hv).slice(-2)+':'+mv;
 }
-function toggleDayClosed(day){
-  var cb=document.getElementById('tt-closed-'+day);
-  var fromEl=document.getElementById('tt-from-'+day);
-  var toEl=document.getElementById('tt-to-'+day);
+function toggleDayClosed(cb){
+  var day=cb.id.replace('tt-closed-','');
   var closed=cb.checked;
-  fromEl.disabled=closed;toEl.disabled=closed;
-  fromEl.style.background=closed?'#f0f4f8':'';toEl.style.background=closed?'#f0f4f8':'';
+  ['fh','fm','fa','th','tm','ta'].forEach(function(p){
+    var el=document.getElementById('tt-'+p+'-'+day);
+    if(el){el.disabled=closed;el.style.background=closed?'#f0f4f8':'';}
+  });
   cb.parentElement.style.color=closed?'var(--red)':'var(--muted)';
-  var fd=document.getElementById('tt-from-disp-'+day);
-  var td=document.getElementById('tt-to-disp-'+day);
-  if(fd)fd.textContent=closed?'':(fromEl.value?fmtTime24to12(fromEl.value):'');
-  if(td)td.textContent=closed?'':(toEl.value?fmtTime24to12(toEl.value):'');
 }
 function saveTimetableV2(){
   if(!requireInternet('tt-msg'))return;
@@ -3016,8 +2995,8 @@ function saveTimetableV2(){
   var data={lastUpdated:new Date().toLocaleString(),days:{}};
   days.forEach(function(d){
     data.days[d]={
-      from:document.getElementById('tt-from-'+d).value,
-      to:document.getElementById('tt-to-'+d).value,
+      from:getTimeFrom12('tt-f',d),
+      to:getTimeFrom12('tt-t',d),
       closed:document.getElementById('tt-closed-'+d).checked
     };
   });
@@ -3058,7 +3037,6 @@ function processNextApptCnic(){
   +'</div>';
 }
 function saveNextAppt(cnic){
-  if(!requireInternet(null))return;
   var dt=document.getElementById('na-datetime').value;
   if(!dt){showMsg('na-msg','Please select date & time.','error');return;}
   var note=document.getElementById('na-note').value.trim();
@@ -3327,9 +3305,7 @@ async function loadDrReportsList(){
   if(!bodyEl)return;
   bodyEl.innerHTML='<div style="text-align:center;padding:24px;"><div class="spinner" style="width:24px;height:24px;border-width:3px;border-color:rgba(184,0,10,.2);border-top-color:var(--red);margin:0 auto;"></div><div style="font-size:.75rem;color:var(--muted);margin-top:8px;">Loading all reports...</div></div>';
   var reports=[];
-  if(window._fbGetAllReports){
-    try{reports=await window._fbGetAllReports();}catch(e){}
-  }
+  
   window._allDrReports=reports;
   renderDrReportsList(reports);
 }
@@ -3387,9 +3363,7 @@ async function patientLoadReports(){
   var listEl=document.getElementById('pt-reports-list');
   var cnic=currentUser.cnic;
   var reports=[];
-  if(window._fbGetReports){
-    try{reports=await window._fbGetReports(cnic);}catch(e){}
-  }
+  
   if(btn){btn.disabled=false;btn.innerHTML='🔍 Find My Reports';}
   listEl.style.display='';
   if(!reports.length){
@@ -3715,7 +3689,7 @@ function checkPTN(who,redrawFn){
           var iv=setInterval(function(){
             pp+=Math.random()*9+4;
             if(pp>=100){pp=100;clearInterval(iv);bar.style.width='100%';pEl.textContent='100%';
-              setTimeout(async function(){try{var _as=await db.collection('appointments').get();var _ap=[];_as.forEach(function(d){_ap.push(d.data());});localStorage.setItem('dush_appts',JSON.stringify(_ap));var _us=await db.collection('users').get();var _up={};_us.forEach(function(d){_up[d.id]=d.data();});if(Object.keys(_up).length>0)localStorage.setItem('dush_users',JSON.stringify(_up));}catch(e){}updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');startDrPolling();},350);}
+              setTimeout(function(){updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');},350);}
             bar.style.width=pp+'%';pEl.textContent=Math.floor(pp)+'%';
           },70);
         });
@@ -4236,7 +4210,7 @@ function adminViewDetail(cnic){
   if(wrap.style.display==='block'){wrap.style.display='none';return;}
   var users=getUsers();var u=users[cnic];
   if(!u){wrap.style.display='none';return;}
-  var appts=getAppts().filter(function(a){return a.patientCnic===cnic;});
+  var appts=[];//getAppts().filter(function(a){return a.patientCnic===cnic;});
   var pinHistory=[];
   try{pinHistory=JSON.parse(_ls.getItem('dush_pin_history_'+cnic)||'[]');}catch(e){}
   var admitted=get(DADMk)||[];
@@ -4264,17 +4238,7 @@ function adminViewDetail(cnic){
     +'<div style="background:#150d25;border-radius:7px;padding:7px 9px;text-align:center;"><div style="font-size:.58rem;color:#6040a0;">Total Appts</div><div style="font-size:.9rem;font-weight:900;color:#d0b0ff;">'+appts.length+'</div></div>'
     +'<div style="background:#150d25;border-radius:7px;padding:7px 9px;text-align:center;"><div style="font-size:.58rem;color:#6040a0;">Admitted</div><div style="font-size:.78rem;font-weight:700;color:'+(isAdmitted?'#f5a623':'#8060b0')+'">'+(isAdmitted?'🛏️ Yes':'No')+'</div></div>'
     +'</div>'
-    // Appointments
-    +(appts.length?'<div style="font-size:.62rem;font-weight:700;color:#6040a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;border-bottom:1px solid #2a1a4a;padding-bottom:4px;">📅 Appointments ('+appts.length+')</div>'
-    +'<div style="max-height:120px;overflow-y:auto;margin-bottom:12px;">'
-    +appts.slice().reverse().map(function(a){
-      var sc={pending:'#f5a623',approved:'#70e0a0',completed:'#5090ff',cancelled:'#ff7070'};
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#150d25;border-radius:6px;margin-bottom:4px;font-size:.68rem;">'
-        +'<span style="color:#c0a0f0;">'+( a.datetime?formatDT(a.datetime):'—')+'</span>'
-        +'<span style="color:'+( sc[a.status]||'#8060b0')+';font-weight:700;">'+a.status+'</span>'
-        +'<span style="color:#8060b0;">'+a.type+'</span>'
-        +'</div>';
-    }).join('')+'</div>':'')
+        // Appointments hidden in admin
     // Admitted history
     +(wasAdmitted.length?'<div style="font-size:.62rem;font-weight:700;color:#6040a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;border-bottom:1px solid #2a1a4a;padding-bottom:4px;">🏥 Discharge History</div>'
     +'<div style="max-height:80px;overflow-y:auto;margin-bottom:10px;">'
@@ -4318,7 +4282,7 @@ function adminConfirmResetPin(cnic){
   var users=getUsers();
   if(!users[cnic]){showMsg('admin-reset-msg','Patient not found.','error');return;}
   // Hash and save new PIN
-  users[cnic].suCode=btoa(newPin);
+  users[cnic].code=newPin;users[cnic].suCode=btoa(newPin);// save both for compatibility
   saveUsers(users);
   // Save history
   var now=new Date();
@@ -4331,7 +4295,6 @@ function adminConfirmResetPin(cnic){
 }
 
 function adminToggleBlock(cnic){
-  if(!requireInternet(null))return;
   var users=getUsers();
   if(!users[cnic])return;
   users[cnic].blocked=!users[cnic].blocked;
@@ -4643,6 +4606,15 @@ function showPaidReceipt(apptId){
 window.showPaidReceipt=showPaidReceipt;
 window._closeDevModal=function(){closeModal('info');};
 window.closeReceipt=function(){document.getElementById('receipt-overlay').classList.remove('active');};
+window.downloadReceipt=function(){
+  var h=document.getElementById('receipt-print-area').innerHTML;
+  var css='body{font-family:sans-serif;padding:20px;max-width:420px;margin:0 auto;}.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:.82rem;}.rl{color:#888;font-weight:700;}.rv{font-weight:700;text-align:right;}';
+  var full='<html><head><meta charset="UTF-8"><title>Receipt</title><style>'+css+'</style></head><body>'+h+'</body></html>';
+  var a=document.createElement('a');
+  a.href='data:text/html;charset=utf-8,'+encodeURIComponent(full);
+  a.download='DarUlSalam_Receipt.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+};
 window.printReceipt=function(){
   var h=document.getElementById('receipt-print-area').innerHTML;
   var w=window.open('','_blank','width=440,height=680');
@@ -4913,13 +4885,21 @@ function previewTestSlip(){
   var dateStr=now.toLocaleDateString('en-PK',{day:'2-digit',month:'long',year:'numeric'});
   var timeStr=now.toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit',hour12:true});
   var html=buildTestSlipHTML(a,tests,dateStr+' '+timeStr);
-  var w=window.open('','_blank');
-  if(!w){alert('Please allow popups');return;}
-  w.document.write(html+'<div style="display:flex;gap:10px;justify-content:center;padding:20px;"><button onclick="window.print()" style="padding:10px 28px;background:#7a4a00;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;">🖨️ Print</button><button onclick="window.close()" style="padding:10px 28px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:1rem;cursor:pointer;">Back</button></div></body></html>');
-  w.document.close();
-  // Save test slip to appointment
-  saveTestSlipToAppt(apptId,tests,dateStr+' '+timeStr);
-  document.getElementById('modal-suggest-test').classList.remove('active');
+  // Show loading on preview button
+  var prevBtn=document.querySelector('#modal-suggest-test button[onclick="previewTestSlip()"]');
+  if(prevBtn){prevBtn.disabled=true;prevBtn.innerHTML='<span class="spinner" style="width:12px;height:12px;border-width:2px;vertical-align:middle;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Uploading...';}
+  setTimeout(function(){
+    // Save first
+    saveTestSlipToAppt(apptId,tests,dateStr+' '+timeStr);
+    document.getElementById('modal-suggest-test').classList.remove('active');
+    if(prevBtn){prevBtn.disabled=false;prevBtn.innerHTML='Next → Preview & Upload';}
+    // Open preview
+    var w=window.open('','_blank');
+    if(!w){alert('Please allow popups');return;}
+    var btns='<div style="text-align:center;padding:16px;"><button onclick="window.print()" style="padding:10px 20px;background:#1a3a8a;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;margin:4px;">🖨️ Print</button><button id="dl-btn" style="padding:10px 20px;background:#0a7a3e;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;margin:4px;">⬇️ Download</button><button onclick="window.close()" style="padding:10px 20px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:.88rem;cursor:pointer;margin:4px;">✕ Close</button></div><script>document.getElementById("dl-btn").onclick=function(){var a=document.createElement("a");a.href="data:text/html;charset=utf-8,"+encodeURIComponent(document.documentElement.outerHTML);a.download="TestSlip.html";document.body.appendChild(a);a.click();document.body.removeChild(a);};<\/script>';
+    w.document.write(html+btns+'</body></html>');
+    w.document.close();
+  },900);
 }
 function buildTestSlipHTML(appt,tests,dateTime){
   var testRows=tests.map(function(t,i){
@@ -5015,37 +4995,27 @@ function playNotifSound(){
 function startDrPolling(){
   if(_drPollInterval)clearInterval(_drPollInterval);
   _lastApptCount=getAppts().filter(function(a){return a.status==='pending';}).length;
-  // Immediate sync on Dr login
+  // Immediate Firebase sync on Dr login
   drSyncFromFirebase();
-  _drPollInterval=setInterval(async function(){
+  _drPollInterval=setInterval(function(){
     var drScreen=document.getElementById('screen-doctor');
     if(!drScreen||!drScreen.classList.contains('active'))return;
-    await drSyncFromFirebase();
-    updateDrNotifications();
-    updateDailySummaryStrip();
-  },12000);
+    drSyncFromFirebase();
+  },15000);
 }
 async function drSyncFromFirebase(){
   try{
-    // Direct db calls - most reliable
     var aSnap=await db.collection("appointments").get();
     var appts=[];aSnap.forEach(function(d){appts.push(d.data());});
-    appts.sort(function(a,b){return (b.id||0)-(a.id||0);});
+    appts.sort(function(a,b){return(b.id||0)-(a.id||0);});
     localStorage.setItem('dush_appts',JSON.stringify(appts));
-    console.log("Dr sync: appointments loaded =",appts.length);
-
-    var cSnap=await db.collection("complaints").get();
-    var complaints=[];cSnap.forEach(function(d){complaints.push(d.data());});
-    localStorage.setItem('dush_complaints',JSON.stringify(complaints));
-
-    var fSnap=await db.collection("feedbacks").get();
-    var feedbacks=[];fSnap.forEach(function(d){feedbacks.push(d.data());});
-    localStorage.setItem('dush_feedbacks',JSON.stringify(feedbacks));
-
     var uSnap=await db.collection("users").get();
     var users={};uSnap.forEach(function(d){users[d.id]=d.data();});
     if(Object.keys(users).length>0)localStorage.setItem('dush_users',JSON.stringify(users));
-  }catch(e){console.warn('drSync error',e);}
+    updateDrNotifications();
+    updateDailySummaryStrip();
+    console.log("Dr sync: "+appts.length+" appointments");
+  }catch(e){console.warn("drSync error:",e);}
 }
 
 // ═══════════════════════════════════════
@@ -5412,7 +5382,6 @@ function saveVisitStatus(idx,vi,val){
   set(DADMk,admitted);
 }
 function dischargePatient(idx){
-  if(!requireInternet(null))return;
   var admitted=get(DADMk)||[];
   var a=admitted[idx];
   if(!a)return;
@@ -5474,10 +5443,14 @@ function toggleNotice(){
   var on=document.getElementById('notice-toggle').checked;
   var notice=get('dush_notice')||{on:false,msg:''};
   notice.on=on;set('dush_notice',notice);
+  // Update toggle visual
+  var tog=document.getElementById('notice-toggle');
+  var spans=tog?tog.parentElement.querySelectorAll('span'):[];
+  if(spans[0])spans[0].style.background=on?'#0a7a3e':'#ccc';
+  if(spans[1])spans[1].style.left=on?'22px':'2px';
   document.getElementById('notice-form-wrap').style.display=on?'block':'none';
 }
 function saveNotice(){
-  if(!requireInternet(null))return;
   var msg=document.getElementById('notice-text').value.trim();
   if(!msg){showMsg('notice-msg-feedback','Please enter a message.','error');return;}
   var today=new Date().toDateString();
@@ -5487,11 +5460,7 @@ function saveNotice(){
 function checkAndShowNotice(){
   var notice=get('dush_notice');
   if(!notice||!notice.on||!notice.msg)return;
-  var today=new Date().toDateString();
-  if(notice.date&&notice.date!==today)return;
-  var seen=_memStore['notice_seen']||null;
-  if(seen===notice.msg)return;
-  _memStore['notice_seen']=notice.msg;
+  // Show every login as long as notice is ON
   document.getElementById('notice-overlay-msg').innerHTML=notice.msg.replace(/\n/g,'<br/>');
   document.getElementById('modal-notice').classList.add('active');
 }
@@ -5526,108 +5495,254 @@ function drSearchSelect(cnic){
 
 
 
+
+
+
+function animFile(){
+  var el=document.getElementById('aa-file');
+  var road=document.querySelector('.aa-road');
+  if(!el||!road||!_aaRunning)return;
+  var maxLeft=road.offsetWidth-34;
+  el.style.transition='none';el.style.left='0px';el.style.opacity='1';el.style.transform='translateY(-65%) scale(1)';
+  setTimeout(function(){
+    el.style.transition='left 900ms linear';
+    el.style.left=maxLeft+'px';
+    setTimeout(function(){
+      el.style.transition='opacity .15s,transform .15s';
+      el.style.opacity='0';el.style.transform='translateY(-65%) scale(.3)';
+      setTimeout(function(){if(_aaRunning)animFile();},200);
+    },900);
+  },50);
+}
+
+
+
+
+// ══ APPOINTMENT ANIMATION ══
+var _aaOn=false,_aaTmr=null,_aaIdx=0;
+var _aaMsgs=['📤 Sending Appointment...','🔗 Connecting to Hospital...','📋 Uploading Details...','✔ Verifying...','🏥 Almost Done...'];
+function startApptAnim(){
+  if(_aaOn)return;
+  _aaOn=true;_aaIdx=0;
+  var ov=document.getElementById('appt-anim-ov');
+  var main=document.getElementById('aa-anim-main');
+  var succ=document.getElementById('aa-success-box');
+  var st=document.getElementById('aa-status-msg');
+  if(!ov)return;
+  ov.style.display='flex';
+  main.style.display='flex';
+  succ.style.display='none';
+  st.textContent=_aaMsgs[0];
+  _aaTmr=setInterval(function(){_aaIdx=(_aaIdx+1)%_aaMsgs.length;if(st)st.textContent=_aaMsgs[_aaIdx];},900);
+  aaAnimFile();
+}
+function aaAnimFile(){
+  var el=document.getElementById('aa-moving-file');
+  var road=document.querySelector('.aa-road-line');
+  if(!el||!road||!_aaOn)return;
+  var maxLeft=road.offsetWidth-34;
+  el.style.transition='none';el.style.left='0px';el.style.opacity='1';
+  setTimeout(function(){
+    el.style.transition='left 900ms linear';
+    el.style.left=maxLeft+'px';
+    setTimeout(function(){
+      el.style.opacity='0';
+      setTimeout(function(){if(_aaOn)aaAnimFile();},200);
+    },900);
+  },50);
+}
+function showApptSuccess(){
+  _aaOn=false;
+  if(_aaTmr)clearInterval(_aaTmr);
+  var main=document.getElementById('aa-anim-main');
+  var succ=document.getElementById('aa-success-box');
+  var el=document.getElementById('aa-moving-file');
+  if(el)el.style.opacity='0';
+  if(main)main.style.display='none';
+  if(succ){succ.style.display='flex';}
+  // Play success sound
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    var notes=[[523,0,.15],[659,.18,.15],[784,.36,.15],[1047,.54,.25]];
+    notes.forEach(function(n){
+      var o=ctx.createOscillator();var g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.setValueAtTime(n[0],ctx.currentTime+n[1]);
+      g.gain.setValueAtTime(0,ctx.currentTime+n[1]);
+      g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+n[1]+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n[1]+n[2]);
+      o.start(ctx.currentTime+n[1]);o.stop(ctx.currentTime+n[1]+n[2]+0.05);
+    });
+    if(navigator.vibrate)navigator.vibrate([100,50,100,50,200]);
+  }catch(e){}
+}
+function hideApptAnim(){
+  _aaOn=false;
+  if(_aaTmr)clearInterval(_aaTmr);
+  var ov=document.getElementById('appt-anim-ov');
+  if(ov)ov.style.display='none';
+}
+
+
+// ══ INSTRUCTIONS LANGUAGE TOGGLE ══
+function switchInstrLang(lang){
+  var ur=document.getElementById('instr-text-ur');
+  var en=document.getElementById('instr-text-en');
+  var btnUr=document.getElementById('instr-btn-ur');
+  var btnEn=document.getElementById('instr-btn-en');
+  var lbl=document.getElementById('instr-cb-lbl');
+  var procBtn=document.getElementById('instr-proceed-btn');
+  if(lang==='ur'){
+    if(ur)ur.style.display='block';
+    if(en)en.style.display='none';
+    if(btnUr){btnUr.style.background='linear-gradient(135deg,#b8000a,#7a0007)';btnUr.style.color='#fff';btnUr.style.border='none';}
+    if(btnEn){btnEn.style.background='#f0f4f8';btnEn.style.color='#555';btnEn.style.border='1.5px solid #dde3ec';}
+    if(lbl)lbl.textContent='جی، میں نے ہدایات پڑھ اور سمجھ لی ہیں۔';
+    if(procBtn)procBtn.textContent='آگے بڑھیں ←';
+  } else {
+    if(ur)ur.style.display='none';
+    if(en)en.style.display='block';
+    if(btnEn){btnEn.style.background='linear-gradient(135deg,#b8000a,#7a0007)';btnEn.style.color='#fff';btnEn.style.border='none';}
+    if(btnUr){btnUr.style.background='#f0f4f8';btnUr.style.color='#555';btnUr.style.border='1.5px solid #dde3ec';}
+    if(lbl)lbl.textContent='Yes, I have read and understood the instructions.';
+    if(procBtn)procBtn.textContent='Proceed to Sign Up →';
+  }
+}
+// ══ FORGOT PASSWORD LANGUAGE TOGGLE ══
+function switchFpLang(lang){
+  var ur=document.getElementById('fp-instr-ur');
+  var en=document.getElementById('fp-instr-en');
+  var btnUr=document.getElementById('fp-btn-ur');
+  var btnEn=document.getElementById('fp-btn-en');
+  if(lang==='ur'){
+    if(ur)ur.style.display='block';
+    if(en)en.style.display='none';
+    if(btnUr){btnUr.style.background='linear-gradient(135deg,#b8000a,#7a0007)';btnUr.style.color='#fff';btnUr.style.border='none';}
+    if(btnEn){btnEn.style.background='#f0f4f8';btnEn.style.color='#555';btnEn.style.border='1.5px solid #dde3ec';}
+  } else {
+    if(ur)ur.style.display='none';
+    if(en)en.style.display='block';
+    if(btnEn){btnEn.style.background='linear-gradient(135deg,#b8000a,#7a0007)';btnEn.style.color='#fff';btnEn.style.border='none';}
+    if(btnUr){btnUr.style.background='#f0f4f8';btnUr.style.color='#555';btnUr.style.border='1.5px solid #dde3ec';}
+  }
+}
+
+
+// ══ DIGITAL CLOCK ══
+function updateTvClock(){
+  var n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM',h12=h%12||12;
+  var el=document.getElementById('tv-notice-clock');
+  if(el)el.textContent=(h12<10?'0':'')+h12+':'+(m<10?'0':'')+m+' '+ap;
+}
+setInterval(updateTvClock,1000);updateTvClock();
+
+function updateDigiClocks(){
+  var n=new Date();
+  var h=n.getHours(),m=n.getMinutes();
+  var ap=h>=12?'PM':'AM';
+  var h12=h%12||12;
+  var hh=(h12<10?'0':'')+h12;
+  var mm=(m<10?'0':'')+m;
+  var days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var dateStr=days[n.getDay()]+' '+('0'+n.getDate()).slice(-2)+' '+months[n.getMonth()];
+  var timeStr=hh+':'+mm;
+  ['p-clock','dr-clock'].forEach(function(id){
+    var t=document.getElementById(id+'-time');
+    var a=document.getElementById(id+'-ampm');
+    var d=document.getElementById(id+'-date');
+    if(t)t.textContent=timeStr;
+    if(a)a.textContent=ap;
+    if(d)d.textContent=dateStr;
+  });
+}
+updateDigiClocks();
+setInterval(updateDigiClocks,1000);
+
 </script>
-<!-- ████ PATIENT NOTIFICATION POPUP ████ -->
-<div id="patient-notif-popup">
-  <div class="pnp-head">
-    <span style="font-size:.9rem;">🏥</span>
-    <span class="pnp-appname">DAR UL SALAM HOSPITAL</span>
-    <span class="pnp-time" id="pnp-time">Now</span>
+
+  <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:#fff;letter-spacing:.1em;animation:pulse2 1.2s infinite;">BOOKING...</div>
+</div>
+
+    <div style="font-family:'Merriweather',serif;font-size:1rem;font-weight:700;color:#0a7a3e;margin-bottom:12px;">Appointment Request Sent!</div>
+    <div style="font-size:.82rem;color:#444;line-height:1.75;margin-bottom:18px;">Your appointment request has been sent to <strong>Dr. Nawaz Balouch</strong> (Orthopedic Surgeon, Dar Ul Salam Hospital, Rahim Yar Khan).<br/><br/>Please wait for approval. You will be contacted shortly regarding your appointment.<br/><br/>For updates about your appointment, please keep visiting your account regularly.<br/><br/><strong>Thank you for choosing Dar Ul Salam Hospital!</strong></div>
+    <button onclick="dismissBookingFlash()" style="background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:9px;padding:11px 28px;font-family:'Source Sans 3',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(184,0,10,.3);">OK, Got It ✓</button>
   </div>
-  <div class="pnp-body">
-    <div class="pnp-title" id="pnp-title">Appointment Update</div>
-    <div class="pnp-msg" id="pnp-msg">Your appointment status has been updated.</div>
-    <div class="pnp-btns">
-      <button class="pnp-view" onclick="viewPatientAppts()">👁 View</button>
-      <button class="pnp-dismiss" onclick="dismissPatientNotif()">Dismiss</button>
+</div>
+<!-- BOOKING LOADER -->
+<div id="appt-loading-ov" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:99999;flex-direction:column;align-items:center;justify-content:center;gap:18px;">
+  <div style="width:60px;height:60px;border:5px solid rgba(255,255,255,0.25);border-top:5px solid #fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="font-family:Orbitron,monospace;font-size:0.8rem;font-weight:700;color:#fff;letter-spacing:0.12em;">BOOKING...</div>
+  <div style="font-size:0.72rem;color:rgba(255,255,255,0.6);">Please wait...</div>
+</div>
+
+<!-- BOOKING SUCCESS -->
+<div id="appt-success-ov" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;padding:28px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,0,0,0.4);border-top:5px solid #0a7a3e;">
+    <div style="font-size:3.5rem;margin-bottom:10px;">✅</div>
+    <div style="font-family:'Merriweather',serif;font-size:1rem;font-weight:700;color:#0a7a3e;margin-bottom:14px;">Appointment Request Sent!</div>
+    <div style="font-size:0.82rem;color:#444;line-height:1.8;margin-bottom:20px;">Your appointment request has been sent to <strong>Dr. Nawaz Balouch</strong> (Orthopedic Surgeon, Dar Ul Salam Hospital, Rahim Yar Khan).<br><br>Please wait for approval. You will be contacted shortly regarding your appointment.<br><br>For updates about your appointment, please keep visiting your account regularly.<br><br><strong>Thank you for choosing Dar Ul Salam Hospital! 🏥</strong></div>
+    <button onclick="dismissBookingFlash()" style="width:100%;padding:13px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;box-shadow:0 4px 14px rgba(184,0,10,0.35);">OK, Got It ✓</button>
+  </div>
+</div>
+<!-- APPOINTMENT ANIMATION OVERLAY -->
+<div id="appt-anim-ov">
+  <div class="aa-hosp-lbl">🏥 Dar Ul Salam Hospital · Rahim Yar Khan</div>
+  <div id="aa-anim-main" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+    <div class="aa-scene">
+      <div class="aa-icon-box">
+        <div class="aa-big-icon" style="animation:aaGlowH 2s ease-in-out infinite;">🏠</div>
+        <div class="aa-icon-lbl">Your Home</div>
+      </div>
+      <div class="aa-road-box">
+        <div class="aa-road-line">
+          <div id="aa-moving-file">📄</div>
+        </div>
+      </div>
+      <div class="aa-icon-box">
+        <div class="aa-big-icon" style="animation:aaGlowHosp 2s ease-in-out infinite;">🏥</div>
+        <div class="aa-icon-lbl">Hospital</div>
+      </div>
+    </div>
+    <div id="aa-status-msg">Sending Appointment...</div>
+  </div>
+  <div id="aa-success-box">
+    <div style="background:#fff;border-radius:18px;padding:28px 22px;max-width:330px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,0,0,.5);border-top:5px solid #0a7a3e;margin:0 16px;">
+      <div style="font-size:3.5rem;margin-bottom:10px;">✅</div>
+      <div style="font-family:'Merriweather',serif;font-size:1rem;font-weight:700;color:#0a7a3e;margin-bottom:14px;">Appointment Request Sent!</div>
+      <div style="font-size:.82rem;color:#444;line-height:1.8;margin-bottom:20px;text-align:left;">Your appointment request has been sent to <strong>Dr. Nawaz Balouch</strong> (Orthopedic Surgeon, Dar Ul Salam Hospital, Rahim Yar Khan).<br><br>Please wait for approval. You will be contacted shortly regarding your appointment.<br><br>For updates about your appointment, please keep visiting your account regularly.<br><br><strong>Thank you for choosing Dar Ul Salam Hospital! 🏥</strong></div>
+      <button onclick="hideApptAnim();backPatientDash();" style="width:100%;padding:13px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;box-shadow:0 4px 14px rgba(184,0,10,.35);">✓ OK, Got It — Back to Dashboard</button>
     </div>
   </div>
 </div>
-
-<!-- ████ DR NOTIFICATION POPUP ████ -->
-<div id="dr-notif-popup">
-  <div class="np-head">
-    <span style="font-size:.9rem;">🏥</span>
-    <span class="np-appname">DAR UL SALAM HOSPITAL</span>
-    <span class="np-time" id="np-time">Now</span>
-  </div>
-  <div class="np-body">
-    <div class="np-title" id="np-patient">New Appointment</div>
-    <div class="np-msg" id="np-type">A new appointment request has been received.</div>
-    <div class="np-btns">
-      <button class="np-view" onclick="viewNotifAppts()">👁 View Now</button>
-      <button class="np-dismiss" onclick="dismissDrNotif()">Dismiss</button>
-    </div>
-  </div>
-</div>
-
-<!-- ████ AZAN OVERLAY ████ -->
-<div id="azan-overlay">
-  <div class="azan-modal">
-    <div class="azan-stars">✦ &nbsp;✦ &nbsp;✦</div>
-    <span id="azan-icon" class="azan-moon-icon">🌙</span>
-    <div id="azan-pname" class="azan-prayer-name">NAMAZ TIME</div>
-    <div class="azan-arabic">اللَّهُ أَكْبَرُ</div>
-    <div class="azan-translation">Allahu Akbar — Allah is the Greatest</div>
-    <div id="azan-time-pill" class="azan-time-pill">⏰ --:--</div>
-    <div class="azan-bars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    <button class="azan-dismiss-btn" onclick="dismissAzan()">✅ &nbsp;JazakAllah — Dismiss</button>
-    <div id="azan-next" class="azan-next"></div>
-  </div>
-</div>
-
 <!-- ████ PAID RECEIPT OVERLAY ████ -->
 <div id="receipt-overlay" class="receipt-overlay">
   <div class="receipt-box">
     <div id="receipt-print-area" class="receipt-inner">
       <div class="receipt-header">
-        <div class="receipt-verified">✅ Verified by Dr. Nawaz Balouch — Orthopedic Surgeon, RYK</div>
-        <div class="receipt-divider"></div>
-        <div class="receipt-hosp">🏥 DAR UL SALAM HOSPITAL — RAHIM YAR KHAN</div>
+        <div style="font-size:.66rem;color:#0a7a3e;font-weight:700;margin-bottom:3px;">✅ Verified by Dr. Nawaz Balouch — Orthopedic Surgeon, RYK</div>
+        <div style="height:1px;background:linear-gradient(90deg,transparent,#b8000a,transparent);margin:6px 0;"></div>
+        <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:900;color:#7a0007;letter-spacing:.1em;">🏥 DAR UL SALAM HOSPITAL — RAHIM YAR KHAN</div>
         <div style="font-size:.62rem;color:#888;margin-top:3px;letter-spacing:.06em;">OFFICIAL FEE PAYMENT RECEIPT</div>
       </div>
-      <div class="receipt-token">
-        <div class="receipt-token-label">TO—</span></div>
+      <div style="background:linear-gradient(135deg,#fff8e1,#fff3cc);border:2px solid #f0c040;border-radius:10px;padding:10px;text-align:center;margin:10px 0;">
+        <div style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#7a5000;" id="rcpt-token">—</div>
+        <div style="font-size:.6rem;color:#7a5000;font-weight:700;letter-spacing:.1em;margin-top:2px;">TOKEN NUMBER</div>
+      </div>
+      <div class="receipt-row"><span class="rl">Patient Name</span><span class="rv" id="rcpt-name">—</span></div>
+      <div class="receipt-row"><span class="rl">CNIC</span><span class="rv" id="rcpt-cnic">—</span></div>
       <div class="receipt-row"><span class="rl">Fee Amount</span><span class="rv" id="rcpt-fee">—</span></div>
-      <div class="receipt-row"><span class="rl">Sender Acc Title</span><span class="rv" id="rcpt-acc-title">—</span></div>
-      <div class="receipt-row"><span class="rl">Sender Acc No</span><span class="rv" id="rcpt-acc-no">—</span></div>
-      <div class="receipt-row"><span class="rl">Date/Time</span><span class="rv" id="rcpt-dt">—</span></div>
-      <div class="receipt-row"><span class="rl">Paid On</span><span class="rv" id="rcpt-paid-on">—</span></div>
+      <div class="receipt-row"><span class="rl">Account Title</span><span class="rv" id="rcpt-acc-title">—</span></div>
+      <div class="receipt-row"><span class="rl">Account No</span><span class="rv" id="rcpt-acc-no">—</span></div>
+      <div class="receipt-row"><span class="rl">Appt Date/Time</span><span class="rv" id="rcpt-req-dt">—</span></div>
+      <div class="receipt-row"><span class="rl">Assigned Time</span><span class="rv" id="rcpt-assigned-dt">—</span></div>
       <div class="receipt-row"><span class="rl">Status</span><span class="rv" style="color:#0a7a3e;font-weight:900;">✅ PAID</span></div>
-      <div class="receipt-divider"></div>
-      <div style="text-align:center;font-size:.62rem;color:#aaa;margin-top:6px;font-style:italic;">Thank you for visiting Dar Ul Salam Hospital, Rahim Yar Khan</div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,#b8000a,transparent);margin:10px 0;"></div>
+      <div style="text-align:center;font-size:.62rem;color:#aaa;font-style:italic;">Thank you for visiting Dar Ul Salam Hospital, Rahim Yar Khan</div>
     </div>
-    <!-- Action buttons — outside print area -->
-    <div style="padding:4px 18px 18px;display:flex;flex-direction:column;gap:7px;">
+    <div style="padding:8px 18px 18px;display:flex;flex-direction:column;gap:7px;">
       <div style="display:flex;gap:8px;">
         <button onclick="window.closeReceipt()" style="flex:1;padding:9px;background:#f0f4f8;border:1.5px solid #ddd;border-radius:8px;color:#555;font-size:.82rem;font-weight:700;cursor:pointer;">✕ Close</button>
-        <button onclick="(function(){var h=document.getElementById('receipt-print-area').innerHTML;var w=window.open('','_blank');w.document.write('<html><head><title>Receipt</title><style>body{font-family:sans-serif;padding:20px;max-width:420px;margin:0 auto;}.receipt-hosp{font-size:.9rem;font-weight:900;color:#7a0007;text-align:center;}.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:.82rem;}.rl{color:#888;font-weight:700;}.rv{font-weight:700;text-align:right;}.receipt-divider{height:1px;background:#b8000a;margin:8px 0;}.receipt-token{text-align:center;padding:10px;background:#fff8e0;border-radius:8px;margin:8px 0;}.receipt-token-num{font-size:2.5rem;font-weight:900;color:#7a5000;}.receipt-token-label{font-size:.6rem;color:#aaa;text-transform:uppercase;}</style></head><body>'+h+'<script>window.onload=function(){window.print();}<\/script></body></html>');w.document.close();})()" style="flex:2;padding:9px;background:#1a3a8a;color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;">🖨️ Print</button>
+        <button onclick="window.printReceipt()" style="flex:2;padding:9px;background:#1a3a8a;color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;">🖨️ Print</button>
       </div>
-      <button onclick="(function(){var h=document.getElementById('receipt-print-area').innerHTML;var b=new Blob(['<html><head><title>Receipt</title><style>body{font-family:sans-serif;padding:20px;max-width:420px;margin:0 auto;}.receipt-hosp{font-size:.9rem;font-weight:900;color:#7a0007;text-align:center;}.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:.82rem;}.rl{color:#888;font-weight:700;}.rv{font-weight:700;text-align:right;}.receipt-divider{height:1px;background:#b8000a;margin:8px 0;}.receipt-token{text-align:center;padding:10px;background:#fff8e0;border-radius:8px;margin:8px 0;}.receipt-token-num{font-size:2.5rem;font-weight:900;color:#7a5000;}.receipt-token-label{font-size:.6rem;color:#aaa;text-transform:uppercase;}</style></head><body>'+h+'</body></html>'],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='DarUlSalam_Receipt.html';a.click();})()" style="width:100%;padding:9px;background:linear-gradient(135deg,#0a7a3e,#065a2e);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;">⬇️ Download Receipt</button>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- ████ BOOKING LOADER ████ -->
-<div id="booking-loader">
-  <div class="bl-box">
-    <div class="bl-spinner"></div>
-    <div class="bl-text">Sending Request...</div>
-  </div>
-</div>
-
-<!-- ████ BOOKING FLASH MESSAGE ████ -->
-<div id="booking-flash">
-  <div class="bf-overlay" onclick="dismissBookingFlash()"></div>
-  <div class="bf-card">
-    <div class="bf-icon">✅</div>
-    <div class="bf-title">Appointment Request Sent!</div>
-    <div class="bf-msg">Your appointment request has been sent to <strong>Dr. Nawaz Balouch</strong> (Orthopedic Surgeon). Please wait for approval — you will be contacted shortly.<br/><br/>Thank you for choosing Dar Ul Salam Hospital.</div>
-    <button class="bf-btn" onclick="dismissBookingFlash()">OK, Got It</button>
-  </div>
-</div>
-
-</body>
-</html>
+      <button 
