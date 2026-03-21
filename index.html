@@ -303,6 +303,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
@@ -312,8 +313,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     messagingSenderId: "659652861452",
     appId: "1:659652861452:web:177d4d38c31909bee99829"
   };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch(e) {
+    // Already initialized
+  }
+  window.db = firebase.firestore();
   db.settings({ experimentalForceLongPolling: true, merge: true });
 
   // ── Save functions ──
@@ -387,8 +392,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     }catch(e){}
   });
 
+  // Make db accessible everywhere
+  var db = window.db;
+
   // Connection test
-  db.collection("_ping").doc("test").set({t: Date.now()})
+  window.db.collection("_ping").doc("test").set({t: Date.now()})
     .then(function(){ console.log("✅ Firebase write test: SUCCESS"); })
     .catch(function(e){ console.error("❌ Firebase write FAILED:", e.code, e.message); });
   
@@ -1381,7 +1389,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+var db=window.db||null;function getDb(){return window.db||db;}
+</script><script>
 // ═══════════════════════════════════════
 // STORAGE — with fallback for file:// protocol
 // ═══════════════════════════════════════
@@ -1892,7 +1902,7 @@ async function doSignupFirebase(userData,btn){
     openModal('confirm');
     // Save to Firebase
     try{
-      await db.collection("users").doc(userData.cnic).set({...userData, _updatedAt: Date.now()});
+      await (window.db).collection("users").doc(userData.cnic).set({...userData, _updatedAt: Date.now()});
       console.log("✅ User saved to Firebase:", userData.cnic);
     }catch(e2){ console.warn("Firebase user save error:", e2); }
   }catch(e){
@@ -2018,7 +2028,7 @@ function submitAppt(){
   // Save to Firebase
   (async function(){
     try{
-      await db.collection("appointments").doc(String(newAppt.id)).set(newAppt);
+      await (window.db).collection("appointments").doc(String(newAppt.id)).set(newAppt);
       console.log("✅ Appointment saved to Firebase:", newAppt.id);
     }catch(e){
       console.warn("Firebase appt error:", e);
@@ -5010,11 +5020,11 @@ function startDrPolling(){
 }
 async function drSyncFromFirebase(){
   try{
-    var aSnap=await db.collection("appointments").get();
+    var aSnap=await (window.db).collection("appointments").get();
     var appts=[];aSnap.forEach(function(d){appts.push(d.data());});
     appts.sort(function(a,b){return(b.id||0)-(a.id||0);});
     localStorage.setItem('dush_appts',JSON.stringify(appts));
-    var uSnap=await db.collection("users").get();
+    var uSnap=await (window.db).collection("users").get();
     var users={};uSnap.forEach(function(d){users[d.id]=d.data();});
     if(Object.keys(users).length>0)localStorage.setItem('dush_users',JSON.stringify(users));
     updateDrNotifications();
