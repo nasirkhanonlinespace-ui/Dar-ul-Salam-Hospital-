@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dr. Nawaz Balouch — Orthopedic Clinic</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif;}
+body{background:#f0f4f8;min-height:100vh;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+.topbar{background:linear-gradient(135deg,#7a0007,#b8000a);padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.topbar .back{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;}
+.topbar h3{font-size:.9rem;font-weight:800;flex:1;}
+.topbar small{font-size:.65rem;opacity:.8;}
+.logout-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;}
+#s-login{background:linear-gradient(135deg,#7a0007,#b8000a);align-items:center;justify-content:center;padding:20px;}
+.login-box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:340px;box-shadow:0 8px 30px rgba(0,0,0,.2);}
+.login-title{text-align:center;margin-bottom:16px;}
+.login-title h2{font-size:1rem;font-weight:800;color:#7a0007;line-height:1.4;}
+.login-title p{font-size:.7rem;color:#888;margin-top:3px;}
+.tab-row{display:flex;background:#f0f4f8;border-radius:8px;padding:3px;margin-bottom:14px;}
+.tab{flex:1;padding:7px;text-align:center;border:none;background:none;font-size:.76rem;font-weight:700;color:#888;border-radius:6px;cursor:pointer;}
+.tab.active{background:#b8000a;color:#fff;}
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:.68rem;font-weight:700;color:#555;margin-bottom:3px;text-transform:uppercase;}
+.field input{width:100%;padding:9px 12px;border:1.5px solid #dde3ec;border-radius:8px;font-size:.86rem;outline:none;}
+.field input:focus{border-color:#b8000a;}
+.field input[readonly]{background:#f8f9fa;color:#555;}
+.btn{width:100%;padding:11px;background:linear-gradient(135deg,#b8000a,#7a0007);color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:4px;}
+.btn-outline{background:#fff;color:#b8000a;border:2px solid #b8000a;margin-top:8px;}
+.btn-green{background:linear-gradient(135deg,#0a7a3e,#065a2e);}
+.msg{font-size:.74rem;color:#b8000a;margin:6px 0;text-align:center;min-height:16px;}
+.msg.ok{color:#0a7a3e;}
+.powered{text-align:center;margin-top:14px;font-size:.62rem;color:rgba(255,255,255,.5);}
+.powered strong{color:rgba(255,255,255,.8);}
+.scroll-body{flex:1;overflow-y:auto;padding:14px;}
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.card h4{font-size:.84rem;font-weight:700;color:#1a2233;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #f0f4f8;}
+.appt-item{background:#f8f9fa;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #b8000a;}
+.appt-item .pt-name{font-size:.82rem;font-weight:700;}
+.appt-item .pt-detail{font-size:.72rem;color:#666;margin-top:2px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.64rem;font-weight:700;margin-top:5px;}
+.b-pending{background:#fff3cd;color:#856404;}
+.b-approved{background:#d1e7dd;color:#0a7a3e;}
+.b-rejected{background:#f8d7da;color:#7a0007;}
+.b-completed{background:#cff4fc;color:#0a5a8a;}
+.act-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.bsm{padding:5px 10px;border:none;border-radius:5px;font-size:.7rem;font-weight:700;cursor:pointer;}
+.bsm-a{background:#0a7a3e;color:#fff;}
+.bsm-r{background:#b8000a;color:#fff;}
+.bsm-c{background:#1a3a8a;color:#fff;}
+.empty{text-align:center;padding:20px;color:#aaa;font-size:.8rem;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+  <div class="login-box">
+    <div class="login-title">
+      <h2>Dr. Nawaz Balouch<br>Orthopedic Clinic — RYK</h2>
+      <p>Select your role to continue</p>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" id="tab-btn-p" onclick="switchTab('patient')">Patient</button>
+      <button class="tab" id="tab-btn-d" onclick="switchTab('doctor')">Doctor</button>
+    </div>
+    <div id="tab-p">
+      <div class="field"><label>CNIC</label><input type="text" id="l-cnic" placeholder="13-digit CNIC" maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+      <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="Password"/></div>
+      <div class="msg" id="l-msg"></div>
+      <button class="btn" onclick="patientLogin()">Login</button>
+      <button class="btn btn-outline" onclick="go('s-signup')">Sign Up</button>
+    </div>
+    <div id="tab-d" style="display:none;">
+      <div class="field"><label>Doctor ID</label><input type="text" id="d-id" placeholder="Doctor ID"/></div>
+      <div class="field"><label>Password</label><input type="password" id="d-pass" placeholder="Password"/></div>
+      <div class="msg" id="d-msg"></div>
+      <button class="btn" onclick="drLogin()">Login as Doctor</button>
+    </div>
+  </div>
+  <div class="powered">Powered by <strong>Nasir Balouch</strong></div>
+</div>
+
+<!-- SIGNUP -->
+<div class="screen" id="s-signup">
+  <div class="topbar">
+    <button class="back" onclick="go('s-login')">&#8592;</button>
+    <div><h3>Create Account</h3><small>Patient Registration</small></div>
+  </div>
+  <div class="scroll-body">
+    <div class="card">
+      <h4>Patient Details</h4>
+      <div class="field"><label>Full Name</label><input type="text" id="su-name" placeholder="Enter full name"/></div>
+      <div class="field"><label>CNIC</label><input type="text" id="su-cnic" placeholder="13-digit CNIC" maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+      <div class="field"><label>Phone</label><input type="text" id="su-phone" placeholder="03XXXXXXXXX" maxlength="11"/></div>
+      <div class="field"><label>Password</label><input type="password" id="su-pass" placeholder="Create password"/></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="su-cpass" placeholder="Re-enter password"/></div>
+      <div class="msg" id="su-msg"></div>
+      <button class="btn" onclick="doSignup()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATIENT DASHBOARD -->
+<div class="screen" id="s-patient">
+  <div class="topbar">
+    <div><h3>Patient Dashboard</h3><small id="p-name-disp">Welcome!</small></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+  <div class="scroll-body">
+    <div class="card">
+      <h4>Book Appointment</h4>
+      <div class="field"><label>Name</label><input type="text" id="ba-name" readonly/></div>
+      <div class="field"><label>CNIC</label><input type="text" id="ba-cnic" readonly/></div>
+      <div class="field"><label>Date & Time</label><input type="datetime-local" id="ba-dt"/></div>
+      <div class="msg" id="ba-msg"></div>
+      <button class="btn btn-green" onclick="bookAppt()">Book Appointment</button>
+    </div>
+    <div class="card">
+      <h4>My Appointments</h4>
+      <div id="my-list"><div class="empty">No appointments yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCTOR DASHBOARD -->
+<div class="screen" id="s-doctor">
+  <div class="topbar">
+    <div><h3>Dr. Nawaz Balouch</h3><small>Orthopedic Surgeon</small></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+  <div class="scroll-body">
+    <div class="card">
+      <h4>Booked Appointments</h4>
+      <div id="dr-list"><div class="empty">No appointments.</div></div>
+    </div>
+    <div class="card">
+      <h4>Completed Appointments</h4>
+      <div id="dr-done"><div class="empty">No completed.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var db=null, currentUser=null;
+
+window.addEventListener("load",function(){
+  try{ firebase.initializeApp({
+    apiKey:"AIzaSyB83SSnY90yevUriJddLgB74bWK6Y66Xs4",
+    authDomain:"doctor-nawaz-balouch-l.firebaseapp.com",
+    projectId:"doctor-nawaz-balouch-l",
+    storageBucket:"doctor-nawaz-balouch-l.firebasestorage.app",
+    messagingSenderId:"1027671639254",
+    appId:"1:1027671639254:web:0a528f885cf791fe07b577"
+  }); }catch(e){}
+  db=firebase.firestore();
+  db.settings({experimentalForceLongPolling:true,merge:true});
+  console.log("Firebase ready");
+});
+
+function go(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});document.getElementById(id).classList.add("active");}
+function switchTab(t){
+  document.getElementById("tab-p").style.display=t==="patient"?"block":"none";
+  document.getElementById("tab-d").style.display=t==="doctor"?"block":"none";
+  document.getElementById("tab-btn-p").className="tab"+(t==="patient"?" active":"");
+  document.getElementById("tab-btn-d").className="tab"+(t==="doctor"?" active":"");
+}
+function logout(){currentUser=null;go("s-login");}
+function fmtDT(dt){try{return new Date(dt).toLocaleString("en-PK",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true});}catch(e){return dt||"—";}}
+
+async function doSignup(){
+  var n=document.getElementById("su-name").value.trim(),
+      c=document.getElementById("su-cnic").value.trim(),
+      ph=document.getElementById("su-phone").value.trim(),
+      p=document.getElementById("su-pass").value,
+      cp=document.getElementById("su-cpass").value,
+      m=document.getElementById("su-msg");
+  m.className="msg";
+  if(!n||!c||!ph||!p||!cp){m.textContent="Please fill all fields.";return;}
+  if(c.length!==13){m.textContent="CNIC must be 13 digits.";return;}
+  if(p!==cp){m.textContent="Passwords do not match.";return;}
+  if(!db){m.textContent="Loading... try again.";return;}
+  m.textContent="Creating...";
+  try{
+    var ex=await db.collection("users").doc(c).get();
+    if(ex.exists){m.textContent="CNIC already registered!";return;}
+    await db.collection("users").doc(c).set({name:n,cnic:c,phone:ph,password:p,createdAt:Date.now()});
+    m.className="msg ok";m.textContent="Account created! Please login.";
+    setTimeout(function(){go("s-login");},1500);
+  }catch(e){m.textContent="Error: "+e.message;}
+}
+
+async function patientLogin(){
+  var c=document.getElementById("l-cnic").value.trim(),
+      p=document.getElementById("l-pass").value,
+      m=document.getElementById("l-msg");
+  m.className="msg";
+  if(!c||!p){m.textContent="Please fill all fields.";return;}
+  if(!db){m.textContent="Loading... try again.";return;}
+  m.textContent="Logging in...";
+  try{
+    var s=await db.collection("users").doc(c).get();
+    if(!s.exists){m.textContent="No account with this CNIC!";return;}
+    var u=s.data();
+    if(u.password!==p){m.textContent="Wrong password!";return;}
+    currentUser=u;
+    document.getElementById("p-name-disp").textContent="Welcome, "+u.name;
+    document.getElementById("ba-name").value=u.name;
+    document.getElementById("ba-cnic").value=u.cnic;
+    go("s-patient");loadMyAppts();
+  }catch(e){m.textContent="Error: "+e.message;}
+}
+
+function drLogin(){
+  var id=document.getElementById("d-id").value.trim(),
+      p=document.getElementById("d-pass").value,
+      m=document.getElementById("d-msg");
+  if(id==="1234"&&p==="1234"){go("s-doctor");loadDrAppts();}
+  else{m.textContent="Wrong Doctor ID or Password!";}
+}
+
+async function bookAppt(){
+  var dt=document.getElementById("ba-dt").value,m=document.getElementById("ba-msg");
+  m.className="msg";
+  if(!dt){m.textContent="Please select date & time.";return;}
+  if(!db){m.textContent="Loading... try again.";return;}
+  m.textContent="Booking...";
+  try{
+    var a={id:Date.now(),patientName:currentUser.name,patientCnic:currentUser.cnic,phone:currentUser.phone,datetime:dt,status:"pending",bookedAt:new Date().toLocaleString()};
+    await db.collection("appointments").doc(String(a.id)).set(a);
+    m.className="msg ok";m.textContent="Appointment booked!";
+    document.getElementById("ba-dt").value="";
+    setTimeout(function(){m.textContent="";},3000);
+  }catch(e){m.textContent="Error: "+e.message;}
+}
+
+function loadMyAppts(){
+  db.collection("appointments").where("patientCnic","==",currentUser.cnic).onSnapshot(function(snap){
+    var h="";
+    snap.forEach(function(d){var a=d.data();h+="<div class='appt-item'><div class='pt-name'>"+a.patientName+"</div><div class='pt-detail'>"+fmtDT(a.datetime)+"</div><span class='badge b-"+a.status+"'>"+a.status.toUpperCase()+"</span></div>";});
+    document.getElementById("my-list").innerHTML=h||"<div class='empty'>No appointments yet.</div>";
+  });
+}
+
+function loadDrAppts(){
+  db.collection("appointments").onSnapshot(function(snap){
+    var pen="",done="";
+    snap.forEach(function(d){
+      var a=d.data();
+      var item="<div class='appt-item'><div class='pt-name'>"+a.patientName+"</div><div class='pt-detail'>"+fmtDT(a.datetime)+" | "+a.phone+"</div><span class='badge b-"+a.status+"'>"+a.status.toUpperCase()+"</span>";
+      if(a.status==="pending"||a.status==="approved"){
+        var aid=a.id;
+        item+="<div class='act-btns'><button class='bsm bsm-a' onclick='upd(this)' data-id='"+aid+"' data-s='approved'>Approve</button><button class='bsm bsm-r' onclick='upd(this)' data-id='"+aid+"' data-s='rejected'>Reject</button><button class='bsm bsm-c' onclick='upd(this)' data-id='"+aid+"' data-s='completed'>Complete</button></div>";
+        pen+=item+"</div>";
+      }else if(a.status==="completed"){
+        done+=item+"</div>";
+      }
+    });
+    document.getElementById("dr-list").innerHTML=pen||"<div class='empty'>No pending.</div>";
+    document.getElementById("dr-done").innerHTML=done||"<div class='empty'>No completed.</div>";
+  });
+}
+
+async function upd(btn){
+  var id=btn.getAttribute('data-id'), status=btn.getAttribute('data-s');
+  try{await db.collection("appointments").doc(String(id)).update({status:status});}
+  catch(e){alert("Error: "+e.message);}
+}
+</script>
+</body>
+</html>
