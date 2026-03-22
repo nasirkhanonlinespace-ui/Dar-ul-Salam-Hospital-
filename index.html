@@ -318,38 +318,38 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
   window.db = _rtdb; // keep window.db for compatibility
 
   // ── WRITE ──
-  function fbSet(path, data){
+  window.fbSet = function(path, data){
     return _rtdb.ref(path).set(data);
-  }
-  function fbPush(path, data){
+  };
+  window.fbPush = function(path, data){
     return _rtdb.ref(path).push(data);
-  }
+  };
   // ── READ ──
-  function fbGet(path){
+  window.fbGet = function(path){
     return _rtdb.ref(path).once('value').then(function(s){ return s.val(); });
-  }
+  };
 
   // ── Save User ──
   window._fbSaveUser = function(cnic, data){
-    return fbSet('users/'+cnic, Object.assign({}, data, {_updatedAt: Date.now()}))
+    return window.fbSet('users/'+cnic, Object.assign({}, data, {_updatedAt: Date.now()}))
       .then(function(){ console.log("✅ User saved:", cnic); })
       .catch(function(e){ console.warn("fbSaveUser error:", e.message); });
   };
   window._fbGetUser = function(cnic){
-    return fbGet('users/'+cnic);
+    return window.fbGet('users/'+cnic);
   };
   window._fbGetAllUsers = function(){
-    return fbGet('users');
+    return window.fbGet('users');
   };
 
   // ── Save Appointment ──
   window._fbSaveAppt = function(appt){
-    return fbSet('appointments/'+appt.id, appt)
+    return window.fbSet('appointments/'+appt.id, appt)
       .then(function(){ console.log("✅ Appt saved:", appt.id); })
       .catch(function(e){ console.warn("fbSaveAppt error:", e.message); });
   };
   window._fbGetAllAppts = function(){
-    return fbGet('appointments').then(function(data){
+    return window.fbGet('appointments').then(function(data){
       if(!data) return [];
       return Object.values(data).sort(function(a,b){ return (b.id||0)-(a.id||0); });
     });
@@ -357,18 +357,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 
   // ── Save Complaint ──
   window._fbSaveComplaint = function(c){
-    return fbSet('complaints/'+c.id, c).catch(function(e){ console.warn(e.message); });
+    return window.fbSet('complaints/'+c.id, c).catch(function(e){ console.warn(e.message); });
   };
   window._fbGetAllComplaints = function(){
-    return fbGet('complaints').then(function(d){ return d ? Object.values(d) : []; });
+    return window.fbGet('complaints').then(function(d){ return d ? Object.values(d) : []; });
   };
 
   // ── Save Feedback ──
   window._fbSaveFeedback = function(f){
-    return fbSet('feedbacks/'+f.id, f).catch(function(e){ console.warn(e.message); });
+    return window.fbSet('feedbacks/'+f.id, f).catch(function(e){ console.warn(e.message); });
   };
   window._fbGetAllFeedbacks = function(){
-    return fbGet('feedbacks').then(function(d){ return d ? Object.values(d) : []; });
+    return window.fbGet('feedbacks').then(function(d){ return d ? Object.values(d) : []; });
   };
 
   // ── Real-time listener — appointments ──
