@@ -302,107 +302,102 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 .pnp-dismiss{background:#f0f4f8;color:var(--muted);}
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-  const firebaseConfig = {
+  try { firebase.initializeApp({
     apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
     authDomain: "dar-ul-salam-hospital-ry-382e2.firebaseapp.com",
     projectId: "dar-ul-salam-hospital-ry-382e2",
+    databaseURL: "https://dar-ul-salam-hospital-ry-382e2-default-rtdb.firebaseio.com",
     storageBucket: "dar-ul-salam-hospital-ry-382e2.firebasestorage.app",
     messagingSenderId: "659652861452",
     appId: "1:659652861452:web:177d4d38c31909bee99829"
-  };
-  try {
-    firebase.initializeApp(firebaseConfig);
-  } catch(e) {
-    // Already initialized
+  }); } catch(e) {}
+
+  var _rtdb = firebase.database();
+  window.db = _rtdb; // keep window.db for compatibility
+
+  // ── WRITE ──
+  function fbSet(path, data){
+    return _rtdb.ref(path).set(data);
   }
-  window.db = firebase.firestore();
-  var _db = window.db;
-  _db.settings({ experimentalForceLongPolling: true, merge: true });
+  function fbPush(path, data){
+    return _rtdb.ref(path).push(data);
+  }
+  // ── READ ──
+  function fbGet(path){
+    return _rtdb.ref(path).once('value').then(function(s){ return s.val(); });
+  }
 
-  // ── Save functions ──
-  window._fbSaveUser = async function(cnic, data){
-    try{ await _db.collection("users").doc(String(cnic)).set({...data, _updatedAt: Date.now()}); }
-    catch(e){ console.warn("fbSaveUser error", e); }
+  // ── Save User ──
+  window._fbSaveUser = function(cnic, data){
+    return fbSet('users/'+cnic, Object.assign({}, data, {_updatedAt: Date.now()}))
+      .then(function(){ console.log("✅ User saved:", cnic); })
+      .catch(function(e){ console.warn("fbSaveUser error:", e.message); });
   };
-  window._fbGetUser = async function(cnic){
-    try{ const s = await _db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
-    catch(e){ return null; }
+  window._fbGetUser = function(cnic){
+    return fbGet('users/'+cnic);
   };
-  window._fbGetAllUsers = async function(){
-    try{ const s = await _db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
-    catch(e){ return null; }
-  };
-  window._fbSaveAppt = async function(appt){
-    try{ await _db.collection("appointments").doc(String(appt.id)).set(appt); }
-    catch(e){ console.warn("fbSaveAppt error", e); }
-  };
-  window._fbGetAllAppts = async function(){
-    try{ const s = await _db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
-    catch(e){ return null; }
-  };
-  window._fbSaveComplaint = async function(c){
-    try{ await _db.collection("complaints").doc(String(c.id||Date.now())).set(c); }
-    catch(e){}
-  };
-  window._fbSaveFeedback = async function(f){
-    try{ await _db.collection("feedbacks").doc(String(f.id||Date.now())).set(f); }
-    catch(e){}
-  };
-  window._fbGetAllComplaints = async function(){
-    try{ const s=await _db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
-    catch(e){ return null; }
-  };
-  window._fbGetAllFeedbacks = async function(){
-    try{ const s=await _db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
-    catch(e){ return null; }
-  };
-  window._fbSaveSlip = async function(slip){
-    try{ await _db.collection("slips").doc(String(slip.apptId||Date.now())).set(slip); }
-    catch(e){}
+  window._fbGetAllUsers = function(){
+    return fbGet('users');
   };
 
-  // ── Real-time listener for appointments ──
-  _db.collection("appointments").onSnapshot(function(snap){
+  // ── Save Appointment ──
+  window._fbSaveAppt = function(appt){
+    return fbSet('appointments/'+appt.id, appt)
+      .then(function(){ console.log("✅ Appt saved:", appt.id); })
+      .catch(function(e){ console.warn("fbSaveAppt error:", e.message); });
+  };
+  window._fbGetAllAppts = function(){
+    return fbGet('appointments').then(function(data){
+      if(!data) return [];
+      return Object.values(data).sort(function(a,b){ return (b.id||0)-(a.id||0); });
+    });
+  };
+
+  // ── Save Complaint ──
+  window._fbSaveComplaint = function(c){
+    return fbSet('complaints/'+c.id, c).catch(function(e){ console.warn(e.message); });
+  };
+  window._fbGetAllComplaints = function(){
+    return fbGet('complaints').then(function(d){ return d ? Object.values(d) : []; });
+  };
+
+  // ── Save Feedback ──
+  window._fbSaveFeedback = function(f){
+    return fbSet('feedbacks/'+f.id, f).catch(function(e){ console.warn(e.message); });
+  };
+  window._fbGetAllFeedbacks = function(){
+    return fbGet('feedbacks').then(function(d){ return d ? Object.values(d) : []; });
+  };
+
+  // ── Real-time listener — appointments ──
+  _rtdb.ref('appointments').on('value', function(snap){
     try{
-      const data=[];
-      snap.forEach(d=>data.push(d.data()));
-      data.sort((a,b)=>(b.id||0)-(a.id||0));
-      localStorage.setItem('dush_appts', JSON.stringify(data));
-      if(window.updateDrNotifications) window.updateDrNotifications();
-      // Auto-refresh Dr booked panel if open
-      var sess=localStorage.getItem('dush_session');
-      if(sess==='doctor'){
-        var panelTitle=document.getElementById('doctor-panel-title');
-        var panelBody=document.getElementById('doctor-panel-body');
-        if(panelTitle && panelTitle.textContent.includes('Booked') && window.renderDrBookedAppts){
-          window.renderDrBookedAppts(panelBody);
-        }
+      var data = snap.val();
+      if(data){
+        var arr = Object.values(data).sort(function(a,b){ return (b.id||0)-(a.id||0); });
+        localStorage.setItem('dush_appts', JSON.stringify(arr));
+        if(window.updateDrNotifications) window.updateDrNotifications();
       }
     }catch(e){}
   });
 
-  // ── Real-time listener for users ──
-  _db.collection("users").onSnapshot(function(snap){
+  // ── Real-time listener — users ──
+  _rtdb.ref('users').on('value', function(snap){
     try{
-      const u={};
-      snap.forEach(d=>u[d.id]=d.data());
-      if(Object.keys(u).length>0) localStorage.setItem('dush_users', JSON.stringify(u));
+      var data = snap.val();
+      if(data) localStorage.setItem('dush_users', JSON.stringify(data));
     }catch(e){}
   });
 
-  // Make db accessible everywhere
-  // db alias already set as _db above
+  // ── Connection test ──
+  _rtdb.ref('_ping').set({ t: Date.now() })
+    .then(function(){ console.log("✅ Realtime DB connected!"); })
+    .catch(function(e){ console.error("❌ RTDB error:", e.message); });
 
-  // Connection test
-  _db.collection("_ping").doc("test").set({t: Date.now()})
-    .then(function(){ console.log("✅ Firebase write test: SUCCESS"); })
-    .catch(function(e){ console.error("❌ Firebase write FAILED:", e.code, e.message); });
-  
-  console.log("✅ Firebase initialized — Dar Ul Salam Hospital");
-</script>
-</head>
+  console.log("✅ Firebase Realtime Database initialized!");
+</script></head>
 <body>
 <!-- Global Loading Overlay -->
 <div id="global-loader" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(139,0,10,0.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;">
@@ -1390,7 +1385,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
-function getDb(){return window.db||null;}
+// getDb deprecated - using _fbSaveUser etc directly
 </script><script>
 // ═══════════════════════════════════════
 // STORAGE — with fallback for file:// protocol
@@ -1645,8 +1640,10 @@ function doLoginFirebase(cnic,pass,remember,btn){
     showLoader('Logging in...');
     var userData=null;
     try{
-      if(window._fbGetUser){ userData=await window._fbGetUser(cnic); }
-      if(userData){ var u=getUsers(); u[cnic]=userData; try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){} }
+      if(window._fbGetUser){
+        var fbUser=await window._fbGetUser(cnic);
+        if(fbUser){ userData=fbUser; var u=getUsers(); u[cnic]=fbUser; try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){} }
+      }
     }catch(e){}
     if(!userData){ userData=getUsers()[cnic]||null; }
     hideLoader();
@@ -1917,15 +1914,10 @@ async function doSignupFirebase(userData,btn){
     document.getElementById('conf-cb2').checked=false;
     document.getElementById('conf-continue-btn').disabled=true;
     openModal('confirm');
-    // Save to Firebase
+    // Save to Firebase Realtime DB
     try{
-      var fbDb = getDb();
-      if(!fbDb){ console.error("❌ getDb() returned null!"); }
-      else {
-        await fbDb.collection("users").doc(String(userData.cnic)).set(Object.assign({}, userData, {_updatedAt: Date.now()}));
-        console.log("✅ User saved to Firebase:", userData.cnic);
-      }
-    }catch(e2){ console.warn("Firebase user save error:", e2.code, e2.message); }
+      if(window._fbSaveUser) await window._fbSaveUser(userData.cnic, userData);
+    }catch(e2){ console.warn("FB save error:", e2.message); }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
     showMsg('signup-msg','❌ Error creating account. Try again.','error');
@@ -2046,19 +2038,10 @@ function submitAppt(){
   var newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob:dob,datetime:datetime,type:type,wa:wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
   var appts=getAppts();appts.push(newAppt);
   try{_ls.setItem(DAk,JSON.stringify(appts));}catch(e){}
-  // Save to Firebase
-  (async function(){
-    try{
-      var fbDb=getDb();
-      if(!fbDb){console.error("❌ getDb null");return;}
-      var plain=JSON.parse(JSON.stringify(newAppt));
-      await fbDb.collection("appointments").doc(String(newAppt.id)).set(plain);
-      console.log("✅ Appointment saved to Firebase:", newAppt.id);
-    }catch(e){
-      console.warn("Firebase appt error:", e.code, e.message);
-      try{ await new Promise(r=>setTimeout(r,2000)); var fb2=getDb(); if(fb2) await fb2.collection("appointments").doc(String(newAppt.id)).set(JSON.parse(JSON.stringify(newAppt))); }catch(e2){ console.warn("Retry failed:",e2.message); }
-    }
-  })();
+  // Save to Firebase Realtime DB
+  if(window._fbSaveAppt){
+    window._fbSaveAppt(newAppt).catch(function(e){ console.warn("Appt save error:", e.message); });
+  }
   updateDrNotifications();
   triggerDrNotif(currentUser.name,type);
   // Start animation
@@ -5044,17 +5027,20 @@ function startDrPolling(){
 }
 async function drSyncFromFirebase(){
   try{
-    var aSnap=await getDb().collection("appointments").get();
-    var appts=[];aSnap.forEach(function(d){appts.push(d.data());});
-    appts.sort(function(a,b){return(b.id||0)-(a.id||0);});
-    localStorage.setItem('dush_appts',JSON.stringify(appts));
-    var uSnap=await getDb().collection("users").get();
-    var users={};uSnap.forEach(function(d){users[d.id]=d.data();});
-    if(Object.keys(users).length>0)localStorage.setItem('dush_users',JSON.stringify(users));
+    if(window._fbGetAllAppts){
+      var appts=await window._fbGetAllAppts();
+      if(appts&&appts.length>0){
+        localStorage.setItem('dush_appts',JSON.stringify(appts));
+        console.log("Dr sync: "+appts.length+" appointments");
+      }
+    }
+    if(window._fbGetAllUsers){
+      var users=await window._fbGetAllUsers();
+      if(users&&Object.keys(users).length>0) localStorage.setItem('dush_users',JSON.stringify(users));
+    }
     updateDrNotifications();
     updateDailySummaryStrip();
-    console.log("Dr sync: "+appts.length+" appointments");
-  }catch(e){console.warn("drSync error:",e);}
+  }catch(e){console.warn("drSync error:",e.message);}
 }
 
 // ═══════════════════════════════════════
