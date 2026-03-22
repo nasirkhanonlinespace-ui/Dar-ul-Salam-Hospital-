@@ -304,98 +304,74 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
-    authDomain: "dar-ul-salam-hospital-ry-382e2.firebaseapp.com",
-    projectId: "dar-ul-salam-hospital-ry-382e2",
-    storageBucket: "dar-ul-salam-hospital-ry-382e2.firebasestorage.app",
-    messagingSenderId: "659652861452",
-    appId: "1:659652861452:web:177d4d38c31909bee99829"
+  firebase.initializeApp({
+    apiKey: "AIzaSyB83SSnY90yevUriJddLgB74bWK6Y66Xs4",
+    authDomain: "doctor-nawaz-balouch-l.firebaseapp.com",
+    projectId: "doctor-nawaz-balouch-l",
+    storageBucket: "doctor-nawaz-balouch-l.firebasestorage.app",
+    messagingSenderId: "1027671639254",
+    appId: "1:1027671639254:web:0a528f885cf791fe07b577"
+  });
+  var db = firebase.firestore();
+  db.settings({experimentalForceLongPolling:true, merge:true});
+
+  window._fbSaveUser = function(cnic, data){
+    return db.collection("users").doc(String(cnic)).set(Object.assign({},data,{_t:Date.now()}));
   };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  db.settings({ experimentalForceLongPolling: true, merge: true });
+  window._fbGetUser = function(cnic){
+    return db.collection("users").doc(String(cnic)).get().then(function(s){return s.exists?s.data():null;});
+  };
+  window._fbGetAllUsers = function(){
+    return db.collection("users").get().then(function(s){var u={};s.forEach(function(d){u[d.id]=d.data();});return u;});
+  };
+  window._fbSaveAppt = function(appt){
+    return db.collection("appointments").doc(String(appt.id)).set(appt);
+  };
+  window._fbGetAllAppts = function(){
+    return db.collection("appointments").get().then(function(s){var a=[];s.forEach(function(d){a.push(d.data());});return a.sort(function(x,y){return(y.id||0)-(x.id||0);});});
+  };
+  window._fbSaveComplaint = function(c){
+    return db.collection("complaints").doc(String(c.id)).set(c);
+  };
+  window._fbSaveFeedback = function(f){
+    return db.collection("feedbacks").doc(String(f.id)).set(f);
+  };
 
-  async function fbSaveUser(cnic, userData) {
-    try { await db.collection("users").doc(String(cnic)).set({...userData, _updatedAt: Date.now()}); }
-    catch(e) { console.warn("fbSaveUser error", e); }
-  }
-  async function fbGetUser(cnic) {
-    try { const s = await db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
-    catch(e) { return null; }
-  }
-  async function fbGetAllUsers() {
-    try { const s = await db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
-    catch(e) { return null; }
-  }
-  async function fbSaveAppt(appt) {
-    try { await db.collection("appointments").doc(String(appt.id)).set(appt); }
-    catch(e) { console.warn("fbSaveAppt error", e); }
-  }
-  async function fbGetAllAppts() {
-    try { const s = await db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
-    catch(e) { return null; }
-  }
-  async function fbSaveComplaint(c) {
-    try { await db.collection("complaints").doc(String(c.id)).set(c); }
-    catch(e) {}
-  }
-  async function fbGetAllComplaints() {
-    try { const s=await db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
-    catch(e) { return null; }
-  }
-  async function fbSaveFeedback(f) {
-    try { await db.collection("feedbacks").doc(String(f.id)).set(f); }
-    catch(e) {}
-  }
-  async function fbGetAllFeedbacks() {
-    try { const s=await db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
-    catch(e) { return null; }
-  }
-
-  // Expose functions
-  window._fbSaveUser = fbSaveUser;
-  window._fbGetUser = fbGetUser;
-  window._fbGetAllUsers = fbGetAllUsers;
-  window._fbSaveAppt = fbSaveAppt;
-  window._fbGetAllAppts = fbGetAllAppts;
-  window._fbSaveComplaint = fbSaveComplaint;
-  window._fbGetAllComplaints = fbGetAllComplaints;
-  window._fbSaveFeedback = fbSaveFeedback;
-  window._fbGetAllFeedbacks = fbGetAllFeedbacks;
-  window._fbReady = true;
-
-  // Real-time listener
-  db.collection("appointments").onSnapshot(function(snap) {
-    try {
-      const data = [];
-      snap.forEach(d => data.push(d.data()));
-      data.sort((a,b) => (b.id||0)-(a.id||0));
-      if(data.length > 0) localStorage.setItem('dush_appts', JSON.stringify(data));
-      if(window.updateDrNotifications) window.updateDrNotifications();
-    } catch(e) {}
+  // Real-time listeners
+  db.collection("appointments").onSnapshot(function(snap){
+    try{
+      var a=[];snap.forEach(function(d){a.push(d.data());});
+      a.sort(function(x,y){return(y.id||0)-(x.id||0);});
+      if(a.length>0)localStorage.setItem('dush_appts',JSON.stringify(a));
+      if(window.updateDrNotifications)window.updateDrNotifications();
+    }catch(e){}
+  });
+  db.collection("users").onSnapshot(function(snap){
+    try{
+      var u={};snap.forEach(function(d){u[d.id]=d.data();});
+      if(Object.keys(u).length>0)localStorage.setItem('dush_users',JSON.stringify(u));
+    }catch(e){}
   });
 
-  db.collection("users").onSnapshot(function(snap) {
-    try {
-      const u = {};
-      snap.forEach(d => u[d.id] = d.data());
-      if(Object.keys(u).length > 0) localStorage.setItem('dush_users', JSON.stringify(u));
-    } catch(e) {}
+  // Sync then boot
+  Promise.all([
+    db.collection("users").get(),
+    db.collection("appointments").get()
+  ]).then(function(results){
+    var uSnap=results[0],aSnap=results[1];
+    var u={};uSnap.forEach(function(d){u[d.id]=d.data();});
+    if(Object.keys(u).length>0)localStorage.setItem('dush_users',JSON.stringify(u));
+    var a=[];aSnap.forEach(function(d){a.push(d.data());});
+    a.sort(function(x,y){return(y.id||0)-(x.id||0);});
+    if(a.length>0)localStorage.setItem('dush_appts',JSON.stringify(a));
+    window._fbReady=true;
+    console.log("✅ Firebase ready!");
+    if(window.bootApp&&!window._bootDone)window.bootApp();
+  }).catch(function(e){
+    console.warn("Firebase sync error:",e.message);
+    window._fbReady=false;
+    if(window.bootApp&&!window._bootDone)window.bootApp();
   });
-
-  // Sync and then boot
-  async function syncAndBoot() {
-    try {
-      const users = await fbGetAllUsers();
-      if(users && Object.keys(users).length > 0) localStorage.setItem('dush_users', JSON.stringify(users));
-      const appts = await fbGetAllAppts();
-      if(appts && appts.length > 0) localStorage.setItem('dush_appts', JSON.stringify(appts));
-      console.log("✅ Firebase sync done!");
-    } catch(e) { console.warn("Sync error:", e); }
-    if(window.bootApp && !window._bootDone) window.bootApp();
-  }
-  syncAndBoot();
 </script></head>
 <body>
 <!-- Global Loading Overlay -->
@@ -1489,9 +1465,9 @@ function bootApp(){
   }catch(e){showScreen('login');showLoginFlash();}
 }
 // Boot - wait for Firebase then boot, fallback after 4s
-// Boot called by Firebase syncAndBoot, or fallback after 5s
 window.onload=function(){
-  setTimeout(function(){if(!window._bootDone)bootApp();}, 5000);
+  // Firebase will call bootApp when ready, fallback after 6s
+  setTimeout(function(){if(!window._bootDone)bootApp();}, 6000);
 };
 
 // ═══════════════════════════════════════
@@ -1635,10 +1611,7 @@ function doLoginFirebase(cnic,pass,remember,btn){
     showLoader('Logging in...');
     var userData=null;
     try{
-      if(window._fbGetUser){
-        var fbUser=await window._fbGetUser(cnic);
-        if(fbUser){ userData=fbUser; var u=getUsers(); u[cnic]=fbUser; try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){} }
-      }
+
     }catch(e){}
     if(!userData){ userData=getUsers()[cnic]||null; }
     hideLoader();
@@ -1703,35 +1676,18 @@ function checkRememberedSession(){
   const sess=_ls.getItem('dush_session');
   if(!sess)return;
   if(sess==='doctor'){
-    (async function(){
-      try{
-        if(window._fbGetAllAppts){var _fa=await window._fbGetAllAppts();if(_fa&&_fa.length>0)localStorage.setItem('dush_appts',JSON.stringify(_fa));}
-        if(window._fbGetAllUsers){var _fu=await window._fbGetAllUsers();if(_fu&&Object.keys(_fu).length>0)localStorage.setItem('dush_users',JSON.stringify(_fu));}
-      }catch(e){}
-      updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');startDrPolling();
-    })();
+    updateDrNotifications();updateDailySummaryStrip();registerDrDevice();showScreen('doctor');startDrPolling();
     return;
   }
   if(sess.startsWith('patient:')){
     const cnic=sess.split(':')[1];
-    showLoader('Logging in...');
-    (async function(){
-      // Try Firebase first
-      try{
-        if(window._fbGetUser){
-          var fbUser=await window._fbGetUser(cnic);
-          if(fbUser){var u=getUsers();u[cnic]=fbUser;try{localStorage.setItem('dush_users',JSON.stringify(u));}catch(e){}}
-        }
-      }catch(e){}
-      var u=getUsers()[cnic];
-      hideLoader();
+    var u=getUsers()[cnic];
       if(!u){_ls.removeItem('dush_session');return;}
       currentUser=u;
-      document.getElementById('patient-name-display').textContent=currentUser.name;
-      document.getElementById('sb-patient-name').textContent=currentUser.name;
-      backPatientDash();showScreen('patient');updateDrNotifications();checkAndShowNotice();
-      setTimeout(function(){var b=document.getElementById('tt-flash-bar');if(b)b.style.display='block';},1200);
-    })();
+    document.getElementById('patient-name-display').textContent=currentUser.name;
+    document.getElementById('sb-patient-name').textContent=currentUser.name;
+    backPatientDash();showScreen('patient');updateDrNotifications();checkAndShowNotice();
+    setTimeout(function(){var b=document.getElementById('tt-flash-bar');if(b)b.style.display='block';},1200);
   }
 }
 
@@ -1879,7 +1835,7 @@ function doSignup(){
 async function waitForFirebase(maxMs){
   maxMs=maxMs||8000;
   var waited=0;
-  while(!window._fbReady&&waited<maxMs){
+  while(false&&waited<maxMs){
     await new Promise(r=>setTimeout(r,200));
     waited+=200;
   }
@@ -1909,21 +1865,12 @@ async function doSignupFirebase(userData,btn){
     document.getElementById('conf-cb2').checked=false;
     document.getElementById('conf-continue-btn').disabled=true;
     openModal('confirm');
-    // Save to Firebase - wait for ready
-    try{
-      // Wait up to 5s for Firebase to be ready
-      var waited=0;
-      while(!window._fbSaveUser && waited<5000){
-        await new Promise(r=>setTimeout(r,200));
-        waited+=200;
-      }
-      if(window._fbSaveUser){
-        await window._fbSaveUser(userData.cnic, userData);
-        showFbToast('✅ Firebase: User saved!', 'green');
-      } else {
-        showFbToast('❌ Firebase timeout after 5s', 'red');
-      }
-    }catch(e2){ showFbToast('❌ Error: '+e2.message, 'red'); }
+    // Save to Firebase
+    if(window._fbSaveUser){
+      window._fbSaveUser(userData.cnic, userData)
+        .then(function(){console.log("✅ User saved to Firebase");})
+        .catch(function(e){console.warn("FB user error:",e.message);});
+    }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
     showMsg('signup-msg','❌ Error creating account. Try again.','error');
@@ -2044,11 +1991,12 @@ function submitAppt(){
   var newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob:dob,datetime:datetime,type:type,wa:wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
   var appts=getAppts();appts.push(newAppt);
   try{_ls.setItem(DAk,JSON.stringify(appts));}catch(e){}
+
   // Save to Firebase
   if(window._fbSaveAppt){
     window._fbSaveAppt(newAppt)
-      .then(function(){ console.log("✅ Appointment saved to Firebase!"); })
-      .catch(function(e){ console.error("❌ Appt Firebase FAILED:", e); });
+      .then(function(){console.log("✅ Appt saved to Firebase");})
+      .catch(function(e){console.warn("FB appt error:",e.message);});
   }
   updateDrNotifications();
   triggerDrNotif(currentUser.name,type);
@@ -2233,7 +2181,7 @@ async function submitComplaint(){
   if(!text){showMsg('complaint-msg','Please write your complaint.','error');return;}
   const btn=document.querySelector('#patient-panel-body .btn-primary');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Submitting...';
   setTimeout(()=>{
-    const newC={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,text,date:new Date().toLocaleString(),viewed:false};const c=getComplaints();c.push(newC);saveComplaints(c);try{if(window._fbSaveComplaint)window._fbSaveComplaint(newC);}catch(e){};
+    const newC={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,text,date:new Date().toLocaleString(),viewed:false};const c=getComplaints();c.push(newC);saveComplaints(c);
     btn.disabled=false;btn.innerHTML='Submit Complaint';showMsg('complaint-msg','✅ Complaint submitted successfully!','success');document.getElementById('complaint-text').value='';updateDrNotifications();
   },1200);
 }
@@ -2252,7 +2200,7 @@ async function submitFeedback(){
   if(!text){showMsg('feedback-msg','Please write your feedback.','error');return;}
   const btn=document.querySelector('#patient-panel-body .btn-primary');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Submitting...';
   setTimeout(()=>{
-    const newF={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,phone:currentUser.phone||'—',text,rating,date:new Date().toLocaleString(),viewed:false,thankYou:false};const f=getFeedbacks();f.push(newF);saveFeedbacks(f);try{if(window._fbSaveFeedback)window._fbSaveFeedback(newF);}catch(e){};
+    const newF={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,phone:currentUser.phone||'—',text,rating,date:new Date().toLocaleString(),viewed:false,thankYou:false};const f=getFeedbacks();f.push(newF);saveFeedbacks(f);
     btn.disabled=false;btn.innerHTML='Submit Feedback';showMsg('feedback-msg','✅ Feedback submitted! Thank you.','success');document.getElementById('feedback-text').value='';updateDrNotifications();
   },1200);
 }
@@ -5033,22 +4981,9 @@ function startDrPolling(){
     drSyncFromFirebase();
   },15000);
 }
-async function drSyncFromFirebase(){
-  try{
-    if(window._fbGetAllAppts){
-      var appts=await window._fbGetAllAppts();
-      if(appts&&appts.length>0){
-        localStorage.setItem('dush_appts',JSON.stringify(appts));
-        console.log("Dr sync: "+appts.length+" appointments");
-      }
-    }
-    if(window._fbGetAllUsers){
-      var users=await window._fbGetAllUsers();
-      if(users&&Object.keys(users).length>0) localStorage.setItem('dush_users',JSON.stringify(users));
-    }
-    updateDrNotifications();
-    updateDailySummaryStrip();
-  }catch(e){console.warn("drSync error:",e.message);}
+function drSyncFromFirebase(){
+  updateDrNotifications();
+  updateDailySummaryStrip();
 }
 
 // ═══════════════════════════════════════
