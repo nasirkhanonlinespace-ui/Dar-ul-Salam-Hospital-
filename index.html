@@ -301,103 +301,101 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 .pnp-view{background:linear-gradient(135deg,#0a7a3e,#0a5a2e);color:#fff;}
 .pnp-dismiss{background:#f0f4f8;color:var(--muted);}
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  try { firebase.initializeApp({
+  const firebaseConfig = {
     apiKey: "AIzaSyDtZ4TdDSTbz3mE-P0wglyqRQNKI0seGPo",
     authDomain: "dar-ul-salam-hospital-ry-382e2.firebaseapp.com",
     projectId: "dar-ul-salam-hospital-ry-382e2",
-    databaseURL: "https://dar-ul-salam-hospital-ry-382e2-default-rtdb.firebaseio.com",
     storageBucket: "dar-ul-salam-hospital-ry-382e2.firebasestorage.app",
     messagingSenderId: "659652861452",
     appId: "1:659652861452:web:177d4d38c31909bee99829"
-  }); } catch(e) {}
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  db.settings({ experimentalForceLongPolling: true, merge: true });
 
-  window._rtdb = firebase.database();
-  var _rtdb = window._rtdb;
-  window.db = _rtdb; // keep window.db for compatibility
+  async function fbSaveUser(cnic, userData) {
+    try { await db.collection("users").doc(String(cnic)).set({...userData, _updatedAt: Date.now()}); }
+    catch(e) { console.warn("fbSaveUser error", e); }
+  }
+  async function fbGetUser(cnic) {
+    try { const s = await db.collection("users").doc(String(cnic)).get(); return s.exists ? s.data() : null; }
+    catch(e) { return null; }
+  }
+  async function fbGetAllUsers() {
+    try { const s = await db.collection("users").get(); const u={}; s.forEach(d=>u[d.id]=d.data()); return u; }
+    catch(e) { return null; }
+  }
+  async function fbSaveAppt(appt) {
+    try { await db.collection("appointments").doc(String(appt.id)).set(appt); }
+    catch(e) { console.warn("fbSaveAppt error", e); }
+  }
+  async function fbGetAllAppts() {
+    try { const s = await db.collection("appointments").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a.sort((x,y)=>(y.id||0)-(x.id||0)); }
+    catch(e) { return null; }
+  }
+  async function fbSaveComplaint(c) {
+    try { await db.collection("complaints").doc(String(c.id)).set(c); }
+    catch(e) {}
+  }
+  async function fbGetAllComplaints() {
+    try { const s=await db.collection("complaints").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    catch(e) { return null; }
+  }
+  async function fbSaveFeedback(f) {
+    try { await db.collection("feedbacks").doc(String(f.id)).set(f); }
+    catch(e) {}
+  }
+  async function fbGetAllFeedbacks() {
+    try { const s=await db.collection("feedbacks").get(); const a=[]; s.forEach(d=>a.push(d.data())); return a; }
+    catch(e) { return null; }
+  }
 
-  // ── WRITE ──
-  window.fbSet = function(path, data){
-    return window._rtdb.ref(path).set(data);
-  };
-  window.fbPush = function(path, data){
-    return window._rtdb.ref(path).push(data);
-  };
-  // ── READ ──
-  window.fbGet = function(path){
-    return window._rtdb.ref(path).once('value').then(function(s){ return s.val(); });
-  };
+  // Expose functions
+  window._fbSaveUser = fbSaveUser;
+  window._fbGetUser = fbGetUser;
+  window._fbGetAllUsers = fbGetAllUsers;
+  window._fbSaveAppt = fbSaveAppt;
+  window._fbGetAllAppts = fbGetAllAppts;
+  window._fbSaveComplaint = fbSaveComplaint;
+  window._fbGetAllComplaints = fbGetAllComplaints;
+  window._fbSaveFeedback = fbSaveFeedback;
+  window._fbGetAllFeedbacks = fbGetAllFeedbacks;
+  window._fbReady = true;
 
-  // ── Save User ──
-  window._fbSaveUser = function(cnic, data){
-    return window.fbSet('users/'+cnic, Object.assign({}, data, {_updatedAt: Date.now()}))
-      .then(function(){ console.log("✅ User saved:", cnic); })
-      .catch(function(e){ console.warn("fbSaveUser error:", e.message); });
-  };
-  window._fbGetUser = function(cnic){
-    return window.fbGet('users/'+cnic);
-  };
-  window._fbGetAllUsers = function(){
-    return window.fbGet('users');
-  };
-
-  // ── Save Appointment ──
-  window._fbSaveAppt = function(appt){
-    return window.fbSet('appointments/'+appt.id, appt)
-      .then(function(){ console.log("✅ Appt saved:", appt.id); })
-      .catch(function(e){ console.warn("fbSaveAppt error:", e.message); });
-  };
-  window._fbGetAllAppts = function(){
-    return window.fbGet('appointments').then(function(data){
-      if(!data) return [];
-      return Object.values(data).sort(function(a,b){ return (b.id||0)-(a.id||0); });
-    });
-  };
-
-  // ── Save Complaint ──
-  window._fbSaveComplaint = function(c){
-    return window.fbSet('complaints/'+c.id, c).catch(function(e){ console.warn(e.message); });
-  };
-  window._fbGetAllComplaints = function(){
-    return window.fbGet('complaints').then(function(d){ return d ? Object.values(d) : []; });
-  };
-
-  // ── Save Feedback ──
-  window._fbSaveFeedback = function(f){
-    return window.fbSet('feedbacks/'+f.id, f).catch(function(e){ console.warn(e.message); });
-  };
-  window._fbGetAllFeedbacks = function(){
-    return window.fbGet('feedbacks').then(function(d){ return d ? Object.values(d) : []; });
-  };
-
-  // ── Real-time listener — appointments ──
-  window._rtdb.ref('appointments').on('value', function(snap){
-    try{
-      var data = snap.val();
-      if(data){
-        var arr = Object.values(data).sort(function(a,b){ return (b.id||0)-(a.id||0); });
-        localStorage.setItem('dush_appts', JSON.stringify(arr));
-        if(window.updateDrNotifications) window.updateDrNotifications();
-      }
-    }catch(e){}
+  // Real-time listener
+  db.collection("appointments").onSnapshot(function(snap) {
+    try {
+      const data = [];
+      snap.forEach(d => data.push(d.data()));
+      data.sort((a,b) => (b.id||0)-(a.id||0));
+      if(data.length > 0) localStorage.setItem('dush_appts', JSON.stringify(data));
+      if(window.updateDrNotifications) window.updateDrNotifications();
+    } catch(e) {}
   });
 
-  // ── Real-time listener — users ──
-  window._rtdb.ref('users').on('value', function(snap){
-    try{
-      var data = snap.val();
-      if(data) localStorage.setItem('dush_users', JSON.stringify(data));
-    }catch(e){}
+  db.collection("users").onSnapshot(function(snap) {
+    try {
+      const u = {};
+      snap.forEach(d => u[d.id] = d.data());
+      if(Object.keys(u).length > 0) localStorage.setItem('dush_users', JSON.stringify(u));
+    } catch(e) {}
   });
 
-  // ── Connection test ──
-  window._rtdb.ref('_ping').set({ t: Date.now() })
-    .then(function(){ console.log("✅ Realtime DB connected!"); })
-    .catch(function(e){ console.error("❌ RTDB error:", e.message); });
-
-  console.log("✅ Firebase Realtime Database initialized!");
+  // Sync and then boot
+  async function syncAndBoot() {
+    try {
+      const users = await fbGetAllUsers();
+      if(users && Object.keys(users).length > 0) localStorage.setItem('dush_users', JSON.stringify(users));
+      const appts = await fbGetAllAppts();
+      if(appts && appts.length > 0) localStorage.setItem('dush_appts', JSON.stringify(appts));
+      console.log("✅ Firebase sync done!");
+    } catch(e) { console.warn("Sync error:", e); }
+    if(window.bootApp && !window._bootDone) window.bootApp();
+  }
+  syncAndBoot();
 </script></head>
 <body>
 <!-- Global Loading Overlay -->
@@ -1491,13 +1489,9 @@ function bootApp(){
   }catch(e){showScreen('login');showLoginFlash();}
 }
 // Boot - wait for Firebase then boot, fallback after 4s
+// Boot called by Firebase syncAndBoot, or fallback after 5s
 window.onload=function(){
-  var waited=0;
-  var waitForFb=setInterval(function(){
-    waited+=100;
-    if(window.db){clearInterval(waitForFb);if(!window._bootDone)bootApp();}
-    else if(waited>=4000){clearInterval(waitForFb);if(!window._bootDone)bootApp();}
-  },100);
+  setTimeout(function(){if(!window._bootDone)bootApp();}, 5000);
 };
 
 // ═══════════════════════════════════════
@@ -1915,16 +1909,19 @@ async function doSignupFirebase(userData,btn){
     document.getElementById('conf-cb2').checked=false;
     document.getElementById('conf-continue-btn').disabled=true;
     openModal('confirm');
-    // Save to Firebase Realtime DB - direct call
+    // Save to Firebase - wait for ready
     try{
-      if(window._rtdb){
-        var saveData = JSON.parse(JSON.stringify(userData));
-        saveData._updatedAt = Date.now();
-        await window._rtdb.ref('users/' + userData.cnic).set(saveData);
-        // Show visible success
+      // Wait up to 5s for Firebase to be ready
+      var waited=0;
+      while(!window._fbSaveUser && waited<5000){
+        await new Promise(r=>setTimeout(r,200));
+        waited+=200;
+      }
+      if(window._fbSaveUser){
+        await window._fbSaveUser(userData.cnic, userData);
         showFbToast('✅ Firebase: User saved!', 'green');
       } else {
-        showFbToast('❌ _rtdb missing: '+typeof window._rtdb, 'red');
+        showFbToast('❌ Firebase timeout after 5s', 'red');
       }
     }catch(e2){ showFbToast('❌ Error: '+e2.message, 'red'); }
   }catch(e){
@@ -2047,12 +2044,11 @@ function submitAppt(){
   var newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob:dob,datetime:datetime,type:type,wa:wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
   var appts=getAppts();appts.push(newAppt);
   try{_ls.setItem(DAk,JSON.stringify(appts));}catch(e){}
-  // Save to Firebase Realtime DB - direct call
-  if(window._rtdb){
-    var apptData = JSON.parse(JSON.stringify(newAppt));
-    window._rtdb.ref('appointments/' + newAppt.id).set(apptData)
+  // Save to Firebase
+  if(window._fbSaveAppt){
+    window._fbSaveAppt(newAppt)
       .then(function(){ console.log("✅ Appointment saved to Firebase!"); })
-      .catch(function(e){ console.error("❌ Appt Firebase FAILED:", e.message); });
+      .catch(function(e){ console.error("❌ Appt Firebase FAILED:", e); });
   }
   updateDrNotifications();
   triggerDrNotif(currentUser.name,type);
