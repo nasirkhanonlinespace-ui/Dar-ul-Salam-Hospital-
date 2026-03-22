@@ -1915,10 +1915,18 @@ async function doSignupFirebase(userData,btn){
     document.getElementById('conf-cb2').checked=false;
     document.getElementById('conf-continue-btn').disabled=true;
     openModal('confirm');
-    // Save to Firebase Realtime DB
+    // Save to Firebase Realtime DB - direct call
     try{
-      if(window._fbSaveUser) await window._fbSaveUser(userData.cnic, userData);
-    }catch(e2){ console.warn("FB save error:", e2.message); }
+      if(window._rtdb){
+        var saveData = JSON.parse(JSON.stringify(userData));
+        saveData._updatedAt = Date.now();
+        await window._rtdb.ref('users/' + userData.cnic).set(saveData);
+        // Show visible success
+        showFbToast('✅ Firebase: User saved!', 'green');
+      } else {
+        showFbToast('❌ _rtdb missing: '+typeof window._rtdb, 'red');
+      }
+    }catch(e2){ showFbToast('❌ Error: '+e2.message, 'red'); }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
     showMsg('signup-msg','❌ Error creating account. Try again.','error');
@@ -2039,9 +2047,12 @@ function submitAppt(){
   var newAppt={id:Date.now(),patientCnic:currentUser.cnic,patientName:currentUser.name,fname:currentUser.fname||'—',address:currentUser.address||'—',phone:currentUser.phone,hphone:currentUser.hphone,email:currentUser.email,gender:currentUser.gender,dob:dob,datetime:datetime,type:type,wa:wa,acctTitle:acct,acctNo:accn,fee:'RS: 1,020',status:'pending',feeStatus:'Unpaid',drRemark:'',assignedDatetime:'',bookedAt:new Date().toLocaleString()};
   var appts=getAppts();appts.push(newAppt);
   try{_ls.setItem(DAk,JSON.stringify(appts));}catch(e){}
-  // Save to Firebase Realtime DB
-  if(window._fbSaveAppt){
-    window._fbSaveAppt(newAppt).catch(function(e){ console.warn("Appt save error:", e.message); });
+  // Save to Firebase Realtime DB - direct call
+  if(window._rtdb){
+    var apptData = JSON.parse(JSON.stringify(newAppt));
+    window._rtdb.ref('appointments/' + newAppt.id).set(apptData)
+      .then(function(){ console.log("✅ Appointment saved to Firebase!"); })
+      .catch(function(e){ console.error("❌ Appt Firebase FAILED:", e.message); });
   }
   updateDrNotifications();
   triggerDrNotif(currentUser.name,type);
@@ -5684,6 +5695,22 @@ function updateDigiClocks(){
 }
 updateDigiClocks();
 setInterval(updateDigiClocks,1000);
+
+
+function showFbToast(msg, color){
+  var t=document.getElementById('fb-debug-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='fb-debug-toast';
+    t.style.cssText='position:fixed;bottom:60px;left:10px;right:10px;z-index:99999;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:700;font-family:monospace;word-break:break-all;';
+    document.body.appendChild(t);
+  }
+  t.style.background=color==='green'?'#0a7a3e':'#b8000a';
+  t.style.color='#fff';
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(function(){t.style.display='none';},8000);
+}
 
 </script>
 
