@@ -304,16 +304,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  firebase.initializeApp({
-    apiKey: "AIzaSyB83SSnY90yevUriJddLgB74bWK6Y66Xs4",
-    authDomain: "doctor-nawaz-balouch-l.firebaseapp.com",
-    projectId: "doctor-nawaz-balouch-l",
-    storageBucket: "doctor-nawaz-balouch-l.firebasestorage.app",
-    messagingSenderId: "1027671639254",
-    appId: "1:1027671639254:web:0a528f885cf791fe07b577"
-  });
-  var db = firebase.firestore();
-  db.settings({experimentalForceLongPolling:true, merge:true});
+  var db = null;
+  window.addEventListener('load', function(){
+    try{ firebase.initializeApp({
+      apiKey: "AIzaSyB83SSnY90yevUriJddLgB74bWK6Y66Xs4",
+      authDomain: "doctor-nawaz-balouch-l.firebaseapp.com",
+      projectId: "doctor-nawaz-balouch-l",
+      storageBucket: "doctor-nawaz-balouch-l.firebasestorage.app",
+      messagingSenderId: "1027671639254",
+      appId: "1:1027671639254:web:0a528f885cf791fe07b577"
+    }); } catch(e) { /* already init */ }
+    db = firebase.firestore();
+    db.settings({experimentalForceLongPolling:true, merge:true});
 
   window._fbSaveUser = function(cnic, data){
     return db.collection("users").doc(String(cnic)).set(Object.assign({},data,{_t:Date.now()}));
@@ -372,6 +374,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Source Sans 3',san
     window._fbReady=false;
     if(window.bootApp&&!window._bootDone)window.bootApp();
   });
+  }); // end window.addEventListener load
 </script></head>
 <body>
 <!-- Global Loading Overlay -->
@@ -1465,10 +1468,8 @@ function bootApp(){
   }catch(e){showScreen('login');showLoginFlash();}
 }
 // Boot - wait for Firebase then boot, fallback after 4s
-window.onload=function(){
-  // Firebase will call bootApp when ready, fallback after 6s
-  setTimeout(function(){if(!window._bootDone)bootApp();}, 6000);
-};
+// bootApp called by Firebase when ready, fallback after 8s
+setTimeout(function(){if(!window._bootDone)bootApp();}, 8000);
 
 // ═══════════════════════════════════════
 // DATE/TIME FORMAT HELPER
@@ -1868,8 +1869,8 @@ async function doSignupFirebase(userData,btn){
     // Save to Firebase
     if(window._fbSaveUser){
       window._fbSaveUser(userData.cnic, userData)
-        .then(function(){console.log("✅ User saved to Firebase");})
-        .catch(function(e){console.warn("FB user error:",e.message);});
+        .then(function(){console.log("✅ User saved!");})
+        .catch(function(e){console.warn("FB error:",e.message);});
     }
   }catch(e){
     btn.disabled=false;btn.innerHTML='Create Account';btn.style.opacity='1';hideLoader();
